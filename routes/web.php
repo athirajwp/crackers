@@ -21,6 +21,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/checkout/success/{order_number}', [CheckoutController::class, 'success'])->name('checkout.success');
+Route::view('/about', 'about')->name('about');
+Route::get('/price_list', [HomeController::class, 'priceList'])->name('price_list');
+Route::get('/price-list', [HomeController::class, 'priceList']);
 
 // 2. Public Order Tracking
 Route::get('/track', [OrderTrackingController::class, 'index'])->name('track.index');

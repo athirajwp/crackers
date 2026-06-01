@@ -33,4 +33,26 @@ class HomeController extends Controller
 
         return view('storefront', compact('categories', 'settings'));
     }
+
+    /**
+     * Display the official printable price list page.
+     */
+    public function priceList()
+    {
+        $categories = Category::active()
+            ->with(['products' => function ($query) {
+                $query->active();
+            }])
+            ->orderBy('sort_order', 'asc')
+            ->get();
+
+        $settings = [
+            'discount_percent' => Setting::get('discount_percent', 60),
+            'store_phone' => Setting::get('store_phone', '+91 9998887776'),
+            'store_email' => Setting::get('store_email', 'crackerdemo@gmail.com'),
+            'store_address' => Setting::get('store_address', 'Virudhunagar to Sivakasi Main Road, Sivakasi'),
+        ];
+
+        return view('price_list', compact('categories', 'settings'));
+    }
 }

@@ -123,9 +123,10 @@
             <!-- Nav Links -->
             <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-650">
                 <a href="/" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-house mr-1.5 text-xs text-crimson-500"></i>Home</a>
-                <a href="/" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-list-check mr-1.5 text-xs text-crimson-500"></i>Quick Order</a>
+                <a href="/" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-basket-shopping mr-1.5 text-xs text-crimson-500"></i>Quick Order</a>
+                <a href="{{ route('price_list') }}" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-list-check mr-1.5 text-xs text-crimson-500"></i>Price List</a>
                 <a href="/track" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-magnifying-glass mr-1.5 text-xs text-crimson-500"></i>Track Order</a>
-                <a href="#about-us" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-circle-info mr-1.5 text-xs text-crimson-500"></i>About Us</a>
+                <a href="{{ route('about') }}" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-circle-info mr-1.5 text-xs text-crimson-500"></i>About Us</a>
             </nav>
 
             <!-- CTA / Contact Actions -->
@@ -147,8 +148,9 @@
                 </a>
                 
                 <!-- Admin login shortcut (Hidden on mobile header, available in mobile dropdown) -->
-                <a href="{{ route('admin.login') }}" class="hidden sm:inline-flex text-slate-400 hover:text-slate-650 p-1.5 rounded-lg text-sm transition-colors" title="Admin Portal">
-                    <i class="fa-solid fa-lock"></i>
+                <a href="{{ route('admin.login') }}" class="hidden sm:flex items-center gap-2 bg-slate-100 border border-slate-200 hover:border-slate-300 px-3.5 py-1.5 rounded-full text-xs font-bold text-slate-700 hover:bg-slate-200 transition-all shadow-sm" title="Admin Portal">
+                    <i class="fa-solid fa-lock text-crimson-600"></i>
+                    <span>Admin Portal</span>
                 </a>
 
                 <!-- Mobile Menu Hamburger Toggler -->
@@ -169,12 +171,15 @@
              class="md:hidden bg-white border-t border-slate-200/80 px-4 py-4 space-y-3 shadow-md"
              style="display: none;">
             <a href="/" class="block px-4 py-2.5 rounded-xl text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-crimson-600 transition-all flex items-center gap-2">
-                <i class="fa-solid fa-house text-crimson-500 text-[10px]"></i> Home / Price List
+                <i class="fa-solid fa-house text-crimson-500 text-[10px]"></i> Home / Quick Order
+            </a>
+            <a href="{{ route('price_list') }}" class="block px-4 py-2.5 rounded-xl text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-crimson-600 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-list-check text-crimson-500 text-[10px]"></i> Wholesale Price List
             </a>
             <a href="/track" class="block px-4 py-2.5 rounded-xl text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-crimson-600 transition-all flex items-center gap-2">
                 <i class="fa-solid fa-magnifying-glass text-crimson-500 text-[10px]"></i> Track Your Order
             </a>
-            <a href="#about-us" @click="mobileMenuOpen = false" class="block px-4 py-2.5 rounded-xl text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-crimson-600 transition-all flex items-center gap-2">
+            <a href="{{ route('about') }}" @click="mobileMenuOpen = false" class="block px-4 py-2.5 rounded-xl text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-crimson-600 transition-all flex items-center gap-2">
                 <i class="fa-solid fa-circle-info text-crimson-500 text-[10px]"></i> About Us / Contact
             </a>
             <a href="{{ route('admin.login') }}" class="block px-4 py-2.5 rounded-xl text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-crimson-600 transition-all flex items-center gap-2">
@@ -221,7 +226,9 @@
                 <div>
                     <h4 class="text-sm font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-2 mb-4">Quick Navigation</h4>
                     <ul class="space-y-2 text-xs text-slate-500">
-                        <li><a href="/" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-chevron-right mr-1.5 text-[8px] text-crimson-500"></i>Home / Price List</a></li>
+                        <li><a href="/" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-chevron-right mr-1.5 text-[8px] text-crimson-500"></i>Home / Quick Order</a></li>
+                        <li><a href="{{ route('price_list') }}" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-chevron-right mr-1.5 text-[8px] text-crimson-500"></i>Wholesale Price List</a></li>
+                        <li><a href="{{ route('about') }}" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-chevron-right mr-1.5 text-[8px] text-crimson-500"></i>About Us</a></li>
                         <li><a href="/track" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-chevron-right mr-1.5 text-[8px] text-crimson-500"></i>Order Tracking lookup</a></li>
                         <li><a href="/admin/login" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-chevron-right mr-1.5 text-[8px] text-crimson-500"></i>Admin Dashboard Login</a></li>
                     </ul>

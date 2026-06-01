@@ -57,6 +57,9 @@
     <!-- SweetAlert2 for elegant modal notifications -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
+    <!-- Alpine.js CDN for Reactive Micro-Interactions -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
     <!-- Custom styling -->
     <style>
         .custom-scrollbar::-webkit-scrollbar {
@@ -72,9 +75,75 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex font-sans">
+<body x-data="{ mobileSidebarOpen: false }" class="bg-slate-50 text-slate-800 min-h-screen flex font-sans">
 
-    <!-- 1. Admin Sidebar Navigation (Premium Dark Sidebar) -->
+    <!-- 1. Mobile Sidebar Navigation Drawer -->
+    <div x-show="mobileSidebarOpen" class="fixed inset-0 z-50 flex md:hidden" style="display: none;">
+        <!-- Backdrop -->
+        <div @click="mobileSidebarOpen = false" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+
+        <!-- Sidebar Content -->
+        <div x-transition:enter="transition ease-in-out duration-300 transform" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in-out duration-300 transform" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="relative flex-1 flex flex-col max-w-xs w-full bg-slate-900 text-slate-100 shadow-2xl">
+            <!-- Close button -->
+            <div class="absolute top-0 right-0 -mr-12 pt-4">
+                <button @click="mobileSidebarOpen = false" class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white text-white hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Header Brand -->
+            <div class="px-6 py-5 flex items-center gap-3 border-b border-slate-800/80">
+                <div class="bg-gold-500 p-1.5 rounded-lg">
+                    <i class="fa-solid fa-lock-keyhole text-slate-950 text-base"></i>
+                </div>
+                <div>
+                    <h2 class="text-xs font-black uppercase tracking-widest text-white leading-none">{{ App\Models\Setting::get('store_name', 'Cracker Demo') }}</h2>
+                    <span class="text-[9px] text-slate-500 tracking-wider">Management Console</span>
+                </div>
+            </div>
+
+            <!-- Main Menu Links -->
+            <nav class="flex-grow space-y-1.5 px-3 py-6 overflow-y-auto">
+                <a href="{{ route('admin.dashboard') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold {{ request()->routeIs('admin.dashboard') ? 'bg-gold-500 text-slate-950' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                    <i class="fa-solid fa-chart-line text-sm"></i>
+                    <span>Dashboard Metrics</span>
+                </a>
+                <a href="{{ route('admin.orders.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold {{ request()->routeIs('admin.orders.*') ? 'bg-gold-500 text-slate-950' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                    <i class="fa-solid fa-truck-ramp-box text-sm"></i>
+                    <span>Booked Orders</span>
+                </a>
+                <a href="{{ route('admin.products.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold {{ request()->routeIs('admin.products.*') ? 'bg-gold-500 text-slate-950' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                    <i class="fa-solid fa-boxes-stacked text-sm"></i>
+                    <span>Manage Inventory</span>
+                </a>
+                <a href="{{ route('admin.categories.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold {{ request()->routeIs('admin.categories.*') ? 'bg-gold-500 text-slate-950' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                    <i class="fa-solid fa-list-check text-sm"></i>
+                    <span>Categories List</span>
+                </a>
+                <a href="{{ route('admin.settings.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold {{ request()->routeIs('admin.settings.*') ? 'bg-gold-500 text-slate-950' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                    <i class="fa-solid fa-sliders text-sm"></i>
+                    <span>Store Settings</span>
+                </a>
+            </nav>
+
+            <!-- Footer actions inside sidebar -->
+            <div class="p-4 border-t border-slate-800/80 space-y-2">
+                <a href="/" target="_blank" class="w-full flex items-center justify-center gap-2 py-2 border border-slate-800 hover:border-slate-700 bg-slate-950 hover:bg-slate-900 rounded-xl text-xs font-bold text-slate-300 transition-colors">
+                    <i class="fa-solid fa-globe"></i>
+                    <span>Open Front Store</span>
+                </a>
+                <form action="{{ route('admin.logout') }}" method="POST" class="w-full">
+                    @csrf
+                    <button type="submit" class="w-full flex items-center justify-center gap-2 py-2 bg-crimson-800 hover:bg-crimson-700 text-white rounded-xl text-xs font-black transition-colors">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span>Logout</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Desktop Sidebar Navigation (Premium Dark Sidebar) -->
     <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between flex-shrink-0 select-none hidden md:flex text-slate-100">
         
         <div class="space-y-6 py-6">
@@ -131,14 +200,14 @@
 
     </aside>
 
-    <!-- 2. Main content pane (Premium Light Content) -->
+    <!-- 3. Main content pane (Premium Light Content) -->
     <div class="flex-grow flex flex-col min-w-0">
         
         <!-- Header -->
         <header class="bg-white border-b border-slate-250 h-16 flex items-center justify-between px-6 select-none shadow-sm">
             <div class="flex items-center gap-4">
                 <!-- Mobile Nav toggle -->
-                <button class="md:hidden text-slate-500 hover:text-slate-800 p-2 rounded-lg border border-slate-200">
+                <button @click="mobileSidebarOpen = true" class="md:hidden text-slate-500 hover:text-slate-800 p-2 rounded-lg border border-slate-200">
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 

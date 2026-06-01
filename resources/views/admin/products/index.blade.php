@@ -25,8 +25,8 @@
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
                         <th class="py-4 px-4">Product Details</th>
-                        <th class="py-4 px-4 w-40">Category</th>
-                        <th class="py-4 px-4 w-28 text-center">Pack</th>
+                        <th class="hidden sm:table-cell py-4 px-4 w-40">Category</th>
+                        <th class="hidden sm:table-cell py-4 px-4 w-28 text-center">Pack</th>
                         <th class="py-4 px-4 w-32 text-right">Pricing (MRP/Sell)</th>
                         <th class="py-4 px-4 w-24 text-center">Status</th>
                         <th class="py-4 px-4 w-28 text-center pr-4">Actions</th>
@@ -46,16 +46,23 @@
                                         <i class="fa-solid fa-sparkles text-xs text-crimson-450/40"></i>
                                     @endif
                                 </div>
-                                <strong class="text-slate-800 font-extrabold text-xs leading-normal select-all">{{ $product->name }}</strong>
+                                <div class="space-y-1">
+                                    <strong class="text-slate-800 font-extrabold text-xs leading-normal select-all block">{{ $product->name }}</strong>
+                                    <!-- Responsive inline badges on mobile -->
+                                    <div class="flex flex-wrap items-center gap-1.5 sm:hidden">
+                                        <span class="text-[8px] font-bold text-slate-400 bg-slate-100 border border-slate-150 px-1 py-0.5 rounded uppercase tracking-wider">{{ $product->category->name }}</span>
+                                        <span class="text-[8px] font-bold text-slate-550 bg-slate-100 border border-slate-150 px-1.5 py-0.5 rounded font-mono">{{ $product->pack_size }}</span>
+                                    </div>
+                                </div>
                             </td>
 
                             <!-- Category -->
-                            <td class="py-3 px-4 font-bold text-slate-500">
+                            <td class="hidden sm:table-cell py-3 px-4 font-bold text-slate-500">
                                 {{ $product->category->name }}
                             </td>
 
                             <!-- Pack size -->
-                            <td class="py-3 px-4 text-center text-slate-550 font-bold font-mono">
+                            <td class="hidden sm:table-cell py-3 px-4 text-center text-slate-550 font-bold font-mono">
                                 {{ $product->pack_size }}
                             </td>
 

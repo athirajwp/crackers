@@ -71,28 +71,33 @@
 
             <!-- Invoice Order Items Table -->
             <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs border-collapse">
                     <thead class="select-none">
                         <tr class="bg-slate-50 border-b border-slate-200 text-slate-450 font-bold text-[10px] uppercase tracking-wider">
-                            <th class="py-3.5 px-4">Item Details</th>
-                            <th class="py-3.5 px-4 text-center">Unit</th>
-                            <th class="py-3.5 px-4 text-right">Price (₹)</th>
-                            <th class="py-3.5 px-4 text-center">Qty</th>
-                            <th class="py-3.5 px-4 text-right pr-4">Total (₹)</th>
+                            <th class="py-3.5 px-3 sm:px-4">Item Details</th>
+                            <th class="hidden sm:table-cell py-3.5 px-4 text-center">Unit</th>
+                            <th class="py-3.5 px-3 sm:px-4 text-right">Price (₹)</th>
+                            <th class="py-3.5 px-3 sm:px-4 text-center">Qty</th>
+                            <th class="py-3.5 px-3 sm:px-4 text-right">Sub Total (₹)</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-150 text-slate-700 font-semibold">
                         @foreach($order->items as $item)
                         <tr class="hover:bg-slate-50/50">
-                            <td class="py-3.5 px-4 text-slate-800">{{ $item->product_name }}</td>
-                            <td class="py-3.5 px-4 text-slate-500 text-center font-mono">{{ $item->pack_size }}</td>
-                            <td class="py-3.5 px-4 text-right font-medium text-slate-650">₹{{ number_format($item->price, 2) }}</td>
-                            <td class="py-3.5 px-4 text-center text-slate-700 font-mono font-bold">{{ $item->quantity }}</td>
-                            <td class="py-3.5 px-4 text-right font-bold text-slate-800 pr-4">₹{{ number_format($item->total_price, 2) }}</td>
+                            <td class="py-3.5 px-3 sm:px-4 text-slate-800">
+                                <div class="font-bold text-xs leading-normal">{{ $item->product_name }}</div>
+                                <span class="sm:hidden text-[9px] font-bold text-slate-400 font-mono">{{ $item->pack_size }}</span>
+                            </td>
+                            <td class="hidden sm:table-cell py-3.5 px-4 text-slate-500 text-center font-mono">{{ $item->pack_size }}</td>
+                            <td class="py-3.5 px-3 sm:px-4 text-right font-medium text-slate-650">₹{{ number_format($item->price, 2) }}</td>
+                            <td class="py-3.5 px-3 sm:px-4 text-center text-slate-700 font-mono font-bold">{{ $item->quantity }}</td>
+                            <td class="py-3.5 px-3 sm:px-4 text-right font-extrabold text-crimson-600">₹{{ number_format($item->total_price, 2) }}</td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
+                </div>
             </div>
 
             <!-- Price Totals Panel -->
