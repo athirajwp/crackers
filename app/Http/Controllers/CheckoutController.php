@@ -31,6 +31,7 @@ class CheckoutController extends Controller
             'items.*.id' => 'required|exists:products,id',
             'items.*.qty' => 'required|integer|min:0',
             'notes' => 'nullable|string',
+            'promo_code' => 'nullable|string|max:50',
         ]);
 
         $cartItems = $request->input('items');
@@ -68,7 +69,7 @@ class CheckoutController extends Controller
             return response()->json(['error' => 'Your cart is empty!'], 422);
         }
 
-        // Validate Minimum Purchase
+        // Validate Minimum Purchase (Must qualify based on original net total before promo discount is evaluated)
         $minOrder = Setting::get('min_order_value', 3800);
         if ($netAmount < $minOrder) {
             return response()->json([
@@ -76,7 +77,42 @@ class CheckoutController extends Controller
             ], 422);
         }
 
-        $discountAmount = $subtotal - $netAmount;
+        // Backend Promo Code validation & calculation
+        $promoDiscount = 0;
+        $appliedPromo = null;
+
+        if ($request->filled('promo_code')) {
+            $submittedCode = strtoupper(trim($request->input('promo_code')));
+            for ($i = 1; $i <= 5; $i++) {
+                $codeSetting = strtoupper(trim(Setting::get("promo_code_{$i}", '')));
+                if (!empty($codeSetting) && $codeSetting === $submittedCode) {
+                    $valueSetting = trim(Setting::get("promo_value_{$i}", ''));
+                    $appliedPromo = $codeSetting;
+                    
+                    if (str_contains($valueSetting, '%')) {
+                        $percentage = (float) str_replace('%', '', $valueSetting);
+                        if ($percentage > 0) {
+                            $promoDiscount = ($netAmount * $percentage) / 100;
+                        }
+                    } else {
+                        $flat = (float) $valueSetting;
+                        if ($flat > 0) {
+                            $promoDiscount = min($flat, $netAmount);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        $originalNet = $netAmount;
+        $netAmount = max(0, $originalNet - $promoDiscount);
+        $discountAmount = ($subtotal - $originalNet) + $promoDiscount;
+
+        $notes = $request->notes;
+        if ($appliedPromo) {
+            $notes = trim(($notes ? $notes . "\n" : "") . "[Applied Promo Code: {$appliedPromo} (Saved ₹" . number_format($promoDiscount, 2) . " extra discount)]");
+        }
 
         try {
             DB::beginTransaction();
@@ -96,7 +132,7 @@ class CheckoutController extends Controller
                 'net_amount' => $netAmount,
                 'payment_status' => 'pending',
                 'order_status' => 'pending',
-                'notes' => $request->notes,
+                'notes' => $notes,
             ]);
 
             foreach ($validatedItems as $vItem) {

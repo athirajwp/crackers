@@ -27,29 +27,70 @@
     <section class="container mx-auto px-4 py-16">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             
-            <!-- Left Column: Generated collage of products -->
+            <!-- Left Column: Generated collage of products / uploaded aboutus images -->
             <div class="relative group">
                 <div class="absolute -inset-2 bg-gradient-to-tr from-gold-500 to-crimson-600 rounded-3xl opacity-10 blur-xl group-hover:opacity-15 transition-opacity duration-500"></div>
                 <div class="relative bg-white border border-slate-200 p-3.5 rounded-3xl shadow-lg overflow-hidden transform group-hover:scale-[1.01] transition-transform duration-300">
-                    <img src="/images/about_showcase.png" alt="Sivakasi Fireworks Showcase" class="w-full h-auto object-cover rounded-2xl">
+                    @php
+                        $aboutImg1 = App\Models\Setting::get('aboutus_image_1');
+                        $aboutImg2 = App\Models\Setting::get('aboutus_image_2');
+                        $aboutImg3 = App\Models\Setting::get('aboutus_image_3');
+                    @endphp
+
+                    @if($aboutImg1 || $aboutImg2 || $aboutImg3)
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="col-span-2 overflow-hidden rounded-xl aspect-[16/10] bg-slate-50 border border-slate-100 shadow-sm">
+                                <img src="/{{ $aboutImg1 ?: ($aboutImg2 ?: $aboutImg3) }}" alt="Sivakasi Fireworks Showcase 1" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                            </div>
+                            @if($aboutImg2)
+                            <div class="overflow-hidden rounded-xl aspect-[4/3] bg-slate-50 border border-slate-100 shadow-sm">
+                                <img src="/{{ $aboutImg2 }}" alt="Sivakasi Fireworks Showcase 2" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                            </div>
+                            @endif
+                            @if($aboutImg3)
+                            <div class="overflow-hidden rounded-xl aspect-[4/3] bg-slate-50 border border-slate-100 shadow-sm {{ !$aboutImg2 ? 'col-span-2' : '' }}">
+                                <img src="/{{ $aboutImg3 }}" alt="Sivakasi Fireworks Showcase 3" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                            </div>
+                            @endif
+                        </div>
+                    @else
+                        <img src="/images/about_showcase.png" alt="Sivakasi Fireworks Showcase" class="w-full h-auto object-cover rounded-2xl">
+                    @endif
                 </div>
             </div>
 
             <!-- Right Column: Content -->
             <div class="space-y-6">
-                <div class="space-y-2">
-                    <span class="text-xs font-bold text-crimson-600 uppercase tracking-widest"><i class="fa-solid fa-shield-heart mr-1"></i> A Decade of Quality</span>
-                    <h3 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-tight">We Provide Premium Quality Fireworks</h3>
-                </div>
-                <p class="text-xs text-slate-650 leading-relaxed font-semibold">
-                    We are a highly reputed and reliable name involved in the field of Fireworks trading business for the past 10 years. 
-                </p>
-                <p class="text-xs text-slate-500 leading-relaxed font-medium">
-                    We offer a wide range of fireworks products such as Sparklers, Ground Chakkars, Twinkling Stars, Chorsa, Rockets, Flower Pots, Pencils, Atom Bombs, Colour Matches, and other Fancy Aerial Items. We also offer standard and customized fireworks gift boxes at highly competitive Sivakasi wholesale prices.
-                </p>
-                <p class="text-xs text-slate-500 leading-relaxed font-medium">
-                    Through websites, instant WhatsApp checkouts, and modern logistic systems, we are able to process, pack, and ship your orders to Kerala, Karnataka, Andhra, Telangana, and Tamilnadu faster, safer, and on-time to your complete satisfaction.
-                </p>
+                @php
+                    $aboutUsContent = App\Models\Setting::get('about_us');
+                @endphp
+
+                @if(!empty(trim(strip_tags($aboutUsContent))))
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <span class="text-xs font-bold text-crimson-600 uppercase tracking-widest"><i class="fa-solid fa-shield-heart mr-1"></i> A Decade of Quality</span>
+                            <h3 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-tight">About Our Store</h3>
+                        </div>
+                        <div class="text-xs text-slate-600 leading-relaxed font-semibold space-y-4 prose prose-slate">
+                            {!! $aboutUsContent !!}
+                        </div>
+                    </div>
+                @else
+                    <div class="space-y-2">
+                        <span class="text-xs font-bold text-crimson-600 uppercase tracking-widest"><i class="fa-solid fa-shield-heart mr-1"></i> A Decade of Quality</span>
+                        <h3 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-tight">We Provide Premium Quality Fireworks</h3>
+                    </div>
+                    <p class="text-xs text-slate-650 leading-relaxed font-semibold">
+                        We are a highly reputed and reliable name involved in the field of Fireworks trading business for the past 10 years. 
+                    </p>
+                    <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                        We offer a wide range of fireworks products such as Sparklers, Ground Chakkars, Twinkling Stars, Chorsa, Rockets, Flower Pots, Pencils, Atom Bombs, Colour Matches, and other Fancy Aerial Items. We also offer standard and customized fireworks gift boxes at highly competitive Sivakasi wholesale prices.
+                    </p>
+                    <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                        Through websites, instant WhatsApp checkouts, and modern logistic systems, we are able to process, pack, and ship your orders to Kerala, Karnataka, Andhra, Telangana, and Tamilnadu faster, safer, and on-time to your complete satisfaction.
+                    </p>
+                @endif
+                
                 <div class="pt-4 border-t border-slate-100 flex flex-wrap gap-6 text-xs text-slate-650 font-bold">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-square-check text-emerald-600 text-lg"></i>
@@ -57,7 +98,7 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-square-check text-emerald-600 text-lg"></i>
-                        <span>Flat 60% Wholesale Savings</span>
+                        <span>Flat {{ App\Models\Setting::get('discount_percent', 60) }}% Wholesale Savings</span>
                     </div>
                 </div>
             </div>
@@ -161,6 +202,89 @@
                 </div>
             </div>
 
+        </div>
+    </section>
+
+    <!-- 5. Interactive Contact Information & Map Section -->
+    <section class="container mx-auto px-4 py-16 border-t border-slate-200">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            
+            <!-- Left Column: Elegant Contact Information Cards -->
+            <div class="lg:col-span-5 flex flex-col justify-between space-y-6">
+                <div class="space-y-2">
+                    <span class="text-xs font-bold text-crimson-600 uppercase tracking-widest"><i class="fa-solid fa-map-location-dot mr-1"></i> Get In Touch</span>
+                    <h3 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-tight">Contact Information</h3>
+                    <p class="text-xs text-slate-500 font-semibold leading-relaxed">
+                        Need assistance with your booking? Visually trace our physical retail shop or contact us directly via phone, email, or WhatsApp.
+                    </p>
+                </div>
+                
+                <div class="space-y-4">
+                    <!-- Address Card -->
+                    <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-crimson-50 text-crimson-600 flex items-center justify-center flex-shrink-0 border border-crimson-100">
+                            <i class="fa-solid fa-location-dot text-base"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <h4 class="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest">Our Store Address</h4>
+                            <p class="text-xs text-slate-700 leading-normal font-bold">
+                                {{ App\Models\Setting::get('store_address', 'Virudhunagar to Sivakasi Main Road, Sivakasi') }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Call Card -->
+                    <a href="tel:{{ App\Models\Setting::get('store_phone') }}" class="bg-white border border-slate-200 hover:border-slate-350 p-4 rounded-2xl shadow-sm flex items-start gap-4 hover:scale-[1.01] transition-transform">
+                        <div class="w-10 h-10 rounded-xl bg-gold-50 text-gold-600 flex items-center justify-center flex-shrink-0 border border-gold-100">
+                            <i class="fa-solid fa-phone text-base"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <h4 class="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest">Phone & Call Support</h4>
+                            <p class="text-xs text-slate-700 leading-normal font-bold">
+                                {{ App\Models\Setting::get('store_phone', '+91 9998887776') }}
+                            </p>
+                        </div>
+                    </a>
+
+                    <!-- Email Card -->
+                    <a href="mailto:{{ App\Models\Setting::get('store_email') }}" class="bg-white border border-slate-200 hover:border-slate-300 p-4 rounded-2xl shadow-sm flex items-start gap-4 hover:scale-[1.01] transition-transform">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 border border-blue-100">
+                            <i class="fa-solid fa-envelope text-base"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <h4 class="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest">Email Support Address</h4>
+                            <p class="text-xs text-slate-700 leading-normal font-bold">
+                                {{ App\Models\Setting::get('store_email', 'crackerdemo@gmail.com') }}
+                            </p>
+                        </div>
+                    </a>
+
+                    <!-- WhatsApp Card -->
+                    <a href="https://wa.me/{{ App\Models\Setting::get('store_whatsapp', '919998887776') }}" target="_blank" class="bg-emerald-50/50 border border-emerald-100 hover:border-emerald-200 p-4 rounded-2xl shadow-sm flex items-start gap-4 hover:scale-[1.01] transition-transform">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center flex-shrink-0">
+                            <i class="fa-brands fa-whatsapp text-lg"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <h4 class="text-[10px] text-emerald-650 font-extrabold uppercase tracking-widest">WhatsApp Direct Booking</h4>
+                            <p class="text-xs text-emerald-800 leading-normal font-extrabold">
+                                Click to Chat with Support
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Column: Interactive Map Widget -->
+            <div class="lg:col-span-7">
+                <div class="map-container w-full h-full min-h-[350px] rounded-3xl overflow-hidden border border-slate-200 shadow-md">
+                    @if($mapIframe = App\Models\Setting::get('store_map_iframe'))
+                        {!! $mapIframe !!}
+                    @else
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31484.78768782782!2d77.78440079999999!3d9.4475475!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b06cee41fe51a8d%3A0xe964a2754897f1f!2sSivakasi%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1717830000000!5m2!1sen!2sin" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    @endif
+                </div>
+            </div>
+            
         </div>
     </section>
 

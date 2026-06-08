@@ -1,3 +1,52 @@
+@php
+    $theme = App\Models\Setting::get('admin_theme', 'gold');
+    
+    // Set theme classes
+    $themeClasses = [
+        'gold' => [
+            'active' => 'bg-gold-500 text-slate-950',
+            'icon' => 'bg-gold-500 text-slate-950',
+            'border' => 'border-gold-500',
+            'text' => 'text-gold-500',
+            'accent' => 'gold-500',
+            'topbar' => 'bg-white border-b border-slate-250 h-16 flex items-center justify-between px-6 select-none shadow-sm',
+            'topbar_title' => 'text-slate-500',
+            'topbar_badge' => 'text-slate-650 font-bold bg-slate-50 border border-slate-200 text-slate-650'
+        ],
+        'blue' => [
+            'active' => 'bg-blue-600 text-white shadow-md shadow-blue-500/20',
+            'icon' => 'bg-blue-500 text-white',
+            'border' => 'border-blue-600',
+            'text' => 'text-blue-600',
+            'accent' => 'blue-600',
+            'topbar' => 'bg-blue-600 border-b border-blue-700 h-16 flex items-center justify-between px-6 select-none shadow-md text-white',
+            'topbar_title' => 'text-white/90',
+            'topbar_badge' => 'text-white font-bold bg-blue-700 border border-blue-500'
+        ],
+        'crimson' => [
+            'active' => 'bg-crimson-600 text-white shadow-md shadow-crimson-500/20',
+            'icon' => 'bg-crimson-500 text-white',
+            'border' => 'border-crimson-600',
+            'text' => 'text-crimson-600',
+            'accent' => 'crimson-600',
+            'topbar' => 'bg-crimson-600 border-b border-crimson-700 h-16 flex items-center justify-between px-6 select-none shadow-md text-white',
+            'topbar_title' => 'text-white/90',
+            'topbar_badge' => 'text-white font-bold bg-crimson-700 border border-crimson-500'
+        ],
+        'emerald' => [
+            'active' => 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20',
+            'icon' => 'bg-emerald-500 text-white',
+            'border' => 'border-emerald-600',
+            'text' => 'text-emerald-600',
+            'accent' => 'emerald-600',
+            'topbar' => 'bg-emerald-600 border-b border-emerald-700 h-16 flex items-center justify-between px-6 select-none shadow-md text-white',
+            'topbar_title' => 'text-white/90',
+            'topbar_badge' => 'text-white font-bold bg-emerald-700 border border-emerald-500'
+        ]
+    ];
+    
+    $currentTheme = $themeClasses[$theme] ?? $themeClasses['gold'];
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -93,7 +142,7 @@
 
             <!-- Header Brand -->
             <div class="px-6 py-5 flex items-center gap-3 border-b border-slate-800/80">
-                <div class="bg-gold-500 p-1.5 rounded-lg">
+                <div class="{{ $currentTheme['icon'] }} p-1.5 rounded-lg flex items-center justify-center">
                     <i class="fa-solid fa-lock-keyhole text-slate-950 text-base"></i>
                 </div>
                 <div>
@@ -103,24 +152,28 @@
             </div>
 
             <!-- Main Menu Links -->
-            <nav class="flex-grow space-y-1.5 px-3 py-6 overflow-y-auto">
-                <a href="{{ route('admin.dashboard') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold {{ request()->routeIs('admin.dashboard') ? 'bg-gold-500 text-slate-950' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+            <nav class="flex-grow space-y-1.5 px-3 py-6 overflow-y-auto font-semibold">
+                <a href="{{ route('admin.dashboard') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs {{ request()->routeIs('admin.dashboard') ? $currentTheme['active'] : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
                     <i class="fa-solid fa-chart-line text-sm"></i>
                     <span>Dashboard Metrics</span>
                 </a>
-                <a href="{{ route('admin.orders.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold {{ request()->routeIs('admin.orders.*') ? 'bg-gold-500 text-slate-950' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                <a href="{{ route('admin.orders.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs {{ request()->routeIs('admin.orders.*') ? $currentTheme['active'] : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
                     <i class="fa-solid fa-truck-ramp-box text-sm"></i>
                     <span>Booked Orders</span>
                 </a>
-                <a href="{{ route('admin.products.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold {{ request()->routeIs('admin.products.*') ? 'bg-gold-500 text-slate-950' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                <a href="{{ route('admin.products.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs {{ request()->routeIs('admin.products.*') ? $currentTheme['active'] : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
                     <i class="fa-solid fa-boxes-stacked text-sm"></i>
                     <span>Manage Inventory</span>
                 </a>
-                <a href="{{ route('admin.categories.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold {{ request()->routeIs('admin.categories.*') ? 'bg-gold-500 text-slate-950' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                <a href="{{ route('admin.categories.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs {{ request()->routeIs('admin.categories.*') ? $currentTheme['active'] : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
                     <i class="fa-solid fa-list-check text-sm"></i>
                     <span>Categories List</span>
                 </a>
-                <a href="{{ route('admin.settings.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold {{ request()->routeIs('admin.settings.*') ? 'bg-gold-500 text-slate-950' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                <a href="{{ route('admin.branding.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs {{ request()->routeIs('admin.branding.*') ? $currentTheme['active'] : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                    <i class="fa-solid fa-globe text-sm"></i>
+                    <span>Site Branding</span>
+                </a>
+                <a href="{{ route('admin.settings.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs {{ request()->routeIs('admin.settings.*') ? $currentTheme['active'] : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
                     <i class="fa-solid fa-sliders text-sm"></i>
                     <span>Store Settings</span>
                 </a>
@@ -149,7 +202,7 @@
         <div class="space-y-6 py-6">
             <!-- Header Brand -->
             <div class="px-6 flex items-center gap-3">
-                <div class="bg-gold-500 p-1.5 rounded-lg">
+                <div class="{{ $currentTheme['icon'] }} p-1.5 rounded-lg flex items-center justify-center">
                     <i class="fa-solid fa-lock-keyhole text-slate-950 text-base"></i>
                 </div>
                 <div>
@@ -159,24 +212,28 @@
             </div>
 
             <!-- Main Menu Links -->
-            <nav class="space-y-1.5 px-3">
-                <a href="{{ route('admin.dashboard') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold {{ request()->routeIs('admin.dashboard') ? 'bg-gold-500 text-slate-950' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+            <nav class="space-y-1.5 px-3 font-semibold">
+                <a href="{{ route('admin.dashboard') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs {{ request()->routeIs('admin.dashboard') ? $currentTheme['active'] : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
                     <i class="fa-solid fa-chart-line text-sm"></i>
                     <span>Dashboard Metrics</span>
                 </a>
-                <a href="{{ route('admin.orders.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold {{ request()->routeIs('admin.orders.*') ? 'bg-gold-500 text-slate-950' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                <a href="{{ route('admin.orders.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs {{ request()->routeIs('admin.orders.*') ? $currentTheme['active'] : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
                     <i class="fa-solid fa-truck-ramp-box text-sm"></i>
                     <span>Booked Orders</span>
                 </a>
-                <a href="{{ route('admin.products.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold {{ request()->routeIs('admin.products.*') ? 'bg-gold-500 text-slate-950' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                <a href="{{ route('admin.products.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs {{ request()->routeIs('admin.products.*') ? $currentTheme['active'] : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
                     <i class="fa-solid fa-boxes-stacked text-sm"></i>
                     <span>Manage Inventory</span>
                 </a>
-                <a href="{{ route('admin.categories.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold {{ request()->routeIs('admin.categories.*') ? 'bg-gold-500 text-slate-950' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                <a href="{{ route('admin.categories.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs {{ request()->routeIs('admin.categories.*') ? $currentTheme['active'] : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
                     <i class="fa-solid fa-list-check text-sm"></i>
                     <span>Categories List</span>
                 </a>
-                <a href="{{ route('admin.settings.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold {{ request()->routeIs('admin.settings.*') ? 'bg-gold-500 text-slate-950' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                <a href="{{ route('admin.branding.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs {{ request()->routeIs('admin.branding.*') ? $currentTheme['active'] : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                    <i class="fa-solid fa-globe text-sm"></i>
+                    <span>Site Branding</span>
+                </a>
+                <a href="{{ route('admin.settings.index') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs {{ request()->routeIs('admin.settings.*') ? $currentTheme['active'] : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
                     <i class="fa-solid fa-sliders text-sm"></i>
                     <span>Store Settings</span>
                 </a>
@@ -204,18 +261,18 @@
     <div class="flex-grow flex flex-col min-w-0">
         
         <!-- Header -->
-        <header class="bg-white border-b border-slate-250 h-16 flex items-center justify-between px-6 select-none shadow-sm">
+        <header class="{{ $currentTheme['topbar'] }}">
             <div class="flex items-center gap-4">
                 <!-- Mobile Nav toggle -->
-                <button @click="mobileSidebarOpen = true" class="md:hidden text-slate-500 hover:text-slate-800 p-2 rounded-lg border border-slate-200">
+                <button @click="mobileSidebarOpen = true" class="md:hidden text-slate-500 hover:text-slate-800 p-2 rounded-lg border border-slate-200 bg-white">
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 
-                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest hidden sm:block">{{ App\Models\Setting::get('store_name', 'Cracker Demo') }} Dashboard Control</h3>
+                <h3 class="text-xs font-bold {{ $currentTheme['topbar_title'] }} uppercase tracking-widest hidden sm:block">{{ App\Models\Setting::get('store_name', 'Cracker Demo') }} Dashboard Control</h3>
             </div>
 
             <div class="flex items-center gap-3">
-                <span class="text-xs text-slate-650 font-bold bg-slate-50 border border-slate-200 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+                <span class="text-xs {{ $currentTheme['topbar_badge'] }} px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
                     <i class="fa-solid fa-circle text-[8px] text-emerald-500 animate-pulse"></i> Admin Panel
                 </span>
             </div>

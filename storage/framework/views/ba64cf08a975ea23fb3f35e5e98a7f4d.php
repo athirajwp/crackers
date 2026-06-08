@@ -63,6 +63,10 @@
     
     <!-- Custom animations and styles -->
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        
         .glassmorphism {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(12px);
@@ -88,6 +92,12 @@
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
         }
+        
+        .map-container iframe {
+            width: 100% !important;
+            height: 100% !important;
+            border: 0;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans selection:bg-gold-500 selection:text-slate-900">
@@ -95,6 +105,9 @@
     <!-- 1. Scrolling Marquee Header Alert -->
     <div class="bg-crimson-700 border-b border-crimson-800 text-white py-2 text-xs font-semibold marquee-container shadow-sm select-none">
         <div class="marquee-content flex gap-12 items-center">
+            <?php if($bannerScroller = App\Models\Setting::get('banner_scroller')): ?>
+                <span class="text-gold-200"><i class="fa-solid fa-bullhorn text-gold-300 mr-2"></i><strong><?php echo e($bannerScroller); ?></strong></span>
+            <?php endif; ?>
             <span><i class="fa-solid fa-circle-exclamation text-gold-300 mr-2"></i>Minimum Order Value for Sivakasi Delivery is <strong>₹<?php echo e(App\Models\Setting::get('min_order_value', 3800)); ?></strong></span>
             <span><i class="fa-solid fa-fire text-gold-300 mr-2"></i>Celebrate Diwali / Festivals with Flat <strong><?php echo e(App\Models\Setting::get('discount_percent', 60)); ?>% Discount</strong>!</span>
             <span><i class="fa-solid fa-truck-fast text-gold-300 mr-2"></i>Express Lorry Transport Delivery Across Kerala, Karnataka, Tamilnadu, Andhra & Telangana!</span>
@@ -124,7 +137,7 @@
             <!-- Nav Links -->
             <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-650">
                 <a href="/" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-house mr-1.5 text-xs text-crimson-500"></i>Home</a>
-                <a href="/" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-basket-shopping mr-1.5 text-xs text-crimson-500"></i>Quick Order</a>
+                <a href="/#quick-order" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-basket-shopping mr-1.5 text-xs text-crimson-500"></i>Quick Order</a>
                 <a href="<?php echo e(route('price_list')); ?>" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-list-check mr-1.5 text-xs text-crimson-500"></i>Price List</a>
                 <a href="/track" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-magnifying-glass mr-1.5 text-xs text-crimson-500"></i>Track Order</a>
                 <a href="<?php echo e(route('about')); ?>" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-circle-info mr-1.5 text-xs text-crimson-500"></i>About Us</a>
@@ -171,7 +184,7 @@
              x-transition:leave-end="opacity-0 -translate-y-4" 
              class="md:hidden bg-white border-t border-slate-200/80 px-4 py-4 space-y-3 shadow-md"
              style="display: none;">
-            <a href="/" class="block px-4 py-2.5 rounded-xl text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-crimson-600 transition-all flex items-center gap-2">
+            <a href="/#quick-order" class="block px-4 py-2.5 rounded-xl text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-crimson-600 transition-all flex items-center gap-2">
                 <i class="fa-solid fa-house text-crimson-500 text-[10px]"></i> Home / Quick Order
             </a>
             <a href="<?php echo e(route('price_list')); ?>" class="block px-4 py-2.5 rounded-xl text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-crimson-600 transition-all flex items-center gap-2">
@@ -216,29 +229,43 @@
                     <p class="text-xs text-slate-550 leading-relaxed">
                         <?php echo e(App\Models\Setting::get('store_name', 'Cracker Demo')); ?> is a premier firecrackers retailer based in Sivakasi, Virudhunagar, Sivakasi Main Road. We deliver pure joy, colors, and dazzling displays across India, observing the highest safety codes.
                     </p>
-                    <div class="flex gap-3 text-slate-400">
-                        <a href="#" class="hover:text-crimson-600 transition-colors"><i class="fa-brands fa-facebook"></i></a>
-                        <a href="#" class="hover:text-crimson-600 transition-colors"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="https://wa.me/<?php echo e(App\Models\Setting::get('store_whatsapp', '919998887776')); ?>" target="_blank" class="hover:text-crimson-600 transition-colors"><i class="fa-brands fa-whatsapp"></i></a>
+                    <div class="flex gap-4 text-slate-400 text-base">
+                        <?php if($fb = App\Models\Setting::get('facebook_link')): ?>
+                            <a href="<?php echo e($fb); ?>" target="_blank" class="hover:text-crimson-600 transition-all hover:scale-110" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <?php endif; ?>
+                        <?php if($ig = App\Models\Setting::get('instagram_link')): ?>
+                            <a href="<?php echo e($ig); ?>" target="_blank" class="hover:text-crimson-600 transition-all hover:scale-110" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <?php endif; ?>
+                        <?php if($yt = App\Models\Setting::get('youtube_link')): ?>
+                            <a href="<?php echo e($yt); ?>" target="_blank" class="hover:text-crimson-600 transition-all hover:scale-110" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                        <?php endif; ?>
+                        <?php if($tw = App\Models\Setting::get('twitter_link')): ?>
+                            <a href="<?php echo e($tw); ?>" target="_blank" class="hover:text-crimson-600 transition-all hover:scale-110" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                        <?php endif; ?>
+                        <?php
+                            $waLink = App\Models\Setting::get('whatsapp_link') ?: 'https://wa.me/' . App\Models\Setting::get('store_whatsapp', '919998887776');
+                        ?>
+                        <a href="<?php echo e($waLink); ?>" target="_blank" class="hover:text-crimson-600 transition-all hover:scale-110" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
                     </div>
                 </div>
 
                 <!-- Fast Links -->
                 <div>
                     <h4 class="text-sm font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-2 mb-4">Quick Navigation</h4>
-                    <ul class="space-y-2 text-xs text-slate-500">
-                        <li><a href="/" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-chevron-right mr-1.5 text-[8px] text-crimson-500"></i>Home / Quick Order</a></li>
+                    <ul class="space-y-2 text-xs text-slate-500 font-semibold">
+                        <li><a href="/#quick-order" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-chevron-right mr-1.5 text-[8px] text-crimson-500"></i>Home / Quick Order</a></li>
                         <li><a href="<?php echo e(route('price_list')); ?>" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-chevron-right mr-1.5 text-[8px] text-crimson-500"></i>Wholesale Price List</a></li>
                         <li><a href="<?php echo e(route('about')); ?>" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-chevron-right mr-1.5 text-[8px] text-crimson-500"></i>About Us</a></li>
-                        <li><a href="/track" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-chevron-right mr-1.5 text-[8px] text-crimson-500"></i>Order Tracking lookup</a></li>
-                        <li><a href="/admin/login" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-chevron-right mr-1.5 text-[8px] text-crimson-500"></i>Admin Dashboard Login</a></li>
+                        <li><a href="<?php echo e(route('terms')); ?>" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-chevron-right mr-1.5 text-[8px] text-crimson-500"></i>Terms & Conditions</a></li>
+                        <li><a href="/track" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-chevron-right mr-1.5 text-[8px] text-crimson-500"></i>Track Order</a></li>
+                        <li><a href="/admin/login" class="hover:text-crimson-600 transition-colors"><i class="fa-solid fa-chevron-right mr-1.5 text-[8px] text-crimson-500"></i>Admin Portal</a></li>
                     </ul>
                 </div>
 
                 <!-- Contact Particulars -->
                 <div>
                     <h4 class="text-sm font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-2 mb-4">Contact Details</h4>
-                    <ul class="space-y-3 text-xs text-slate-500">
+                    <ul class="space-y-3 text-xs text-slate-500 mb-4">
                         <li class="flex items-start gap-2.5">
                             <i class="fa-solid fa-location-dot text-crimson-500 mt-0.5"></i>
                             <span><?php echo e(App\Models\Setting::get('store_address', 'Virudhunagar to Sivakasi Main Road, Sivakasi')); ?></span>
@@ -252,6 +279,15 @@
                             <span><?php echo e(App\Models\Setting::get('store_email', 'crackerdemo@gmail.com')); ?></span>
                         </li>
                     </ul>
+                    <!-- Compact Google Map Iframe -->
+                    <div class="map-container w-full h-24 rounded-xl overflow-hidden border border-slate-200 shadow-sm opacity-80 hover:opacity-100 transition-opacity">
+                        <?php if($mapIframe = App\Models\Setting::get('store_map_iframe')): ?>
+                            <?php echo $mapIframe; ?>
+
+                        <?php else: ?>
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31484.78768782782!2d77.78440079999999!3d9.4475475!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b06cee41fe51a8d%3A0xe964a2754897f1f!2sSivakasi%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1717830000000!5m2!1sen!2sin" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        <?php endif; ?>
+                    </div>
                 </div>
 
                 <!-- Booking Safety Reminder -->
@@ -267,13 +303,26 @@
 
             </div>
 
+            <!-- Court Order & Legal Compliance Disclaimer -->
+            <div class="mt-10 border-t border-slate-200 pt-8 select-none">
+                <div class="bg-amber-50/50 border border-amber-200/80 rounded-2xl p-5 md:p-6 text-[10px] sm:text-[11px] text-slate-550 leading-relaxed shadow-sm">
+                    <p class="font-extrabold text-amber-800 flex items-center gap-2 text-xs mb-2">
+                        <i class="fa-solid fa-gavel text-amber-700 text-sm"></i>
+                        <span>Supreme Court Order & Legal Compliance Notice</span>
+                    </p>
+                    <p class="leading-relaxed">
+                        As per 2018 Supreme Court Order, Online Sale of Firecrackers are NOT permitted. We Value our customers and at the same time, we respect the jurisdiction. We request our customers to Select Your Products in Estimate Page to see your Estimation and Submit the required crackers through the Get Estimate Button. We will contact you within 2 hrs and Confirm the Order through Phone Call. Please Add and Submit Your enquiries and enjoy your Diwali with jallikattu crackers. Jallikattu Crackers Shop is a shop following 100% legal & statutory compliances and all our shops, go-downs are maintained as per the explosive acts. Our License Name: <strong class="font-extrabold text-slate-800"><?php echo e(App\Models\Setting::get('license_name', '**')); ?></strong> Licence No is <strong class="font-extrabold text-slate-800"><?php echo e(App\Models\Setting::get('license_no', '***')); ?></strong>. We send the parcels through registered and legal transport service providers as like every other major Companies in Sivakasi is doing so.
+                    </p>
+                </div>
+            </div>
+
             <!-- Bottom Credits -->
-            <div class="border-t border-slate-200 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-400 gap-4">
+            <div class="border-t border-slate-200 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-400 gap-4">
                 <p>&copy; 2026 <?php echo e(App\Models\Setting::get('store_name', 'Cracker Demo')); ?> Sivakasi. All Rights Reserved. Designed by pairs.</p>
-                <div class="flex gap-4">
-                    <span class="hover:text-slate-600 transition-colors">Privacy Policy</span>
+                <div class="flex gap-4 font-semibold">
+                    <span class="hover:text-slate-655 cursor-pointer">Privacy Policy</span>
                     <span>&bull;</span>
-                    <span class="hover:text-slate-600 transition-colors">Terms of Booking</span>
+                    <a href="<?php echo e(route('terms')); ?>" class="hover:text-slate-655 transition-colors">Terms of Booking</a>
                 </div>
             </div>
         </div>

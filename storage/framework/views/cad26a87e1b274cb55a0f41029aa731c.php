@@ -21,31 +21,123 @@
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
 
-    <!-- 1. Hero / Promotional Section -->
-    <section class="relative bg-white border-b border-slate-200 overflow-hidden py-16">
-        <!-- Soft gradient mesh in background -->
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-crimson-100/30 via-white to-slate-50 opacity-90 pointer-events-none"></div>
-        
-        <div class="container mx-auto px-4 text-center relative z-10 space-y-6">
-            <span class="inline-flex items-center gap-1.5 bg-crimson-50 border border-crimson-100 text-crimson-700 text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-full shadow-sm animate-pulse">
+    <!-- 1. Hero Image Slider Section -->
+    <?php
+        $sliders = array_filter([
+            App\Models\Setting::get('slider_image_1') ?: 'https://images.unsplash.com/photo-1531747118685-ca8fa6e08806?auto=format&fit=crop&w=1200&q=80',
+            App\Models\Setting::get('slider_image_2') ?: 'https://images.unsplash.com/photo-1482862549707-f63cb32c5fd9?auto=format&fit=crop&w=1200&q=80',
+            App\Models\Setting::get('slider_image_3') ?: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80'
+        ]);
+    ?>
+
+    <section class="relative bg-slate-50 overflow-hidden z-10 select-none">
+        <div class="container mx-auto px-4 pt-6">
+            <div class="relative rounded-2xl md:rounded-3xl overflow-hidden shadow-lg border border-slate-200 bg-white group">
+                
+                <!-- Carousel Container -->
+                <div x-data="{
+                    activeSlide: 0,
+                    totalSlides: <?php echo e(count($sliders)); ?>,
+                    autoplayInterval: null,
+                    nextSlide() {
+                        this.activeSlide = (this.activeSlide + 1) % this.totalSlides;
+                    },
+                    prevSlide() {
+                        this.activeSlide = (this.activeSlide - 1 + this.totalSlides) % this.totalSlides;
+                    },
+                    startAutoplay() {
+                        if (this.totalSlides > 1) {
+                            this.autoplayInterval = setInterval(() => { this.nextSlide() }, 5000);
+                        }
+                    },
+                    stopAutoplay() {
+                        if (this.autoplayInterval) {
+                            clearInterval(this.autoplayInterval);
+                        }
+                    }
+                }" x-init="startAutoplay()" @mouseenter="stopAutoplay()" @mouseleave="startAutoplay()" class="relative w-full aspect-[21/9] sm:aspect-[21/8] md:aspect-[3/1] min-h-[180px] sm:min-h-[260px] md:min-h-[360px] lg:min-h-[440px] overflow-hidden">
+                    
+                    <?php if(count($sliders) > 0): ?>
+                        <!-- Slide items -->
+                        <?php $__currentLoopData = $sliders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $slide): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <div x-show="activeSlide === <?php echo e($index); ?>" 
+                                 x-transition:enter="transition ease-out duration-700 transform" 
+                                 x-transition:enter-start="opacity-0 translate-x-full" 
+                                 x-transition:enter-end="opacity-100 translate-x-0" 
+                                 x-transition:leave="transition ease-in duration-700 transform" 
+                                 x-transition:leave-start="opacity-100 translate-x-0" 
+                                 x-transition:leave-end="opacity-0 -translate-x-full" 
+                                 class="absolute inset-0 w-full h-full" 
+                                 style="display: none;">
+                                <img src="<?php echo e(Str::startsWith($slide, ['http://', 'https://']) ? $slide : '/' . $slide); ?>" alt="Promotional Slide <?php echo e($index + 1); ?>" class="w-full h-full object-cover">
+                            </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                        <!-- Left & Right Arrow Navigation -->
+                        <?php if(count($sliders) > 1): ?>
+                            <button @click="prevSlide()" class="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 w-8 h-8 md:w-11 md:h-11 bg-white/25 hover:bg-white/45 active:bg-white/60 text-white rounded-full flex items-center justify-center backdrop-blur-md border border-white/20 transition-all duration-300 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:scale-105 z-20">
+                                <i class="fa-solid fa-chevron-left text-xs md:text-sm"></i>
+                            </button>
+                            <button @click="nextSlide()" class="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 w-8 h-8 md:w-11 md:h-11 bg-white/25 hover:bg-white/45 active:bg-white/60 text-white rounded-full flex items-center justify-center backdrop-blur-md border border-white/20 transition-all duration-300 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:scale-105 z-20">
+                                <i class="fa-solid fa-chevron-right text-xs md:text-sm"></i>
+                            </button>
+
+                            <!-- Carousel Dot Indicators -->
+                            <div class="absolute bottom-3 md:bottom-5 left-1/2 -translate-x-1/2 flex gap-1.5 md:gap-2 z-20">
+                                <?php $__currentLoopData = $sliders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $slide): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <button @click="activeSlide = <?php echo e($index); ?>" :class="activeSlide === <?php echo e($index); ?> ? 'bg-crimson-600 w-5 md:w-6 shadow-md shadow-crimson-600/40' : 'bg-white/60 hover:bg-white w-1.5 md:w-2'" class="h-1.5 md:h-2 rounded-full transition-all duration-300" title="Slide <?php echo e($index + 1); ?>"></button>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <!-- Soft gradient mesh in background fallback -->
+                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-crimson-100/30 via-white to-slate-50 opacity-90 flex items-center justify-center">
+                            <span class="text-xs uppercase tracking-widest text-slate-400 font-extrabold">Welcome to Sivakasi Fireworks</span>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 1b. Welcome & Quick Order CTA Section -->
+    <section class="container mx-auto px-4 py-8 select-none z-10 relative">
+        <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-sm text-center max-w-4xl mx-auto space-y-6">
+            <span class="inline-flex items-center gap-1.5 bg-crimson-50 border border-crimson-100 text-crimson-700 text-[10px] font-extrabold uppercase tracking-widest px-3.5 py-1 rounded-full shadow-sm animate-pulse">
                 <i class="fa-solid fa-gift"></i> Sivakasi Wholesale Booking Open
             </span>
-            <h2 class="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
-                Get Best Sivakasi Crackers with <br class="hidden sm:inline">
-                <span class="bg-gradient-to-r from-crimson-600 to-crimson-500 bg-clip-text text-transparent">Flat <?php echo e($settings['discount_percent']); ?>% Discount!</span>
-            </h2>
-            <p class="text-sm text-slate-600 max-w-xl mx-auto leading-relaxed font-medium">
-                Add Sivakasi-manufactured fireworks directly from our price list. Minimum order value is ₹<?php echo e(number_format($settings['min_order_value'])); ?>. Place your order, check out, pay via UPI, and receive shipment details via WhatsApp!
-            </p>
-            <div class="flex flex-wrap justify-center gap-4 pt-2">
-                <div class="flex items-center gap-2 bg-slate-100/80 border border-slate-200 px-4 py-2 rounded-xl text-xs font-semibold text-slate-650">
-                    <i class="fa-solid fa-truck text-crimson-600"></i> Delivery by Lorry Transport
+            
+            <div class="space-y-3">
+                <h2 class="text-2xl md:text-3xl lg:text-4xl font-black tracking-tight text-slate-900 leading-tight">
+                    Get Best Sivakasi Crackers with <br class="hidden sm:inline">
+                    <span class="bg-gradient-to-r from-crimson-600 to-crimson-500 bg-clip-text text-transparent">Flat <?php echo e($settings['discount_percent']); ?>% Discount!</span>
+                </h2>
+                <p class="text-xs md:text-sm text-slate-650 max-w-2xl mx-auto leading-relaxed font-semibold">
+                    Add Sivakasi-manufactured fireworks directly from our price list. Minimum order value is ₹<?php echo e(number_format($settings['min_order_value'])); ?>. Place your order, check out, pay via UPI, and receive shipment details via WhatsApp!
+                </p>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-3 md:gap-4 pt-2">
+                <a href="#quick-order" class="bg-gradient-to-r from-crimson-600 to-crimson-500 hover:from-crimson-700 hover:to-crimson-600 text-white font-extrabold px-6 py-3 md:px-8 md:py-3.5 rounded-full text-xs uppercase tracking-wider shadow-md shadow-crimson-100/50 hover:scale-102 active:scale-98 transition-all duration-300 flex items-center gap-2">
+                    <i class="fa-solid fa-basket-shopping text-sm"></i>
+                    <span>Start Quick Order</span>
+                </a>
+                <a href="<?php echo e(route('price_list')); ?>" class="bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-slate-300 text-slate-700 font-extrabold px-6 py-3 md:px-8 md:py-3.5 rounded-full text-xs uppercase tracking-wider shadow-sm hover:scale-102 active:scale-98 transition-all duration-300 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-sm text-crimson-650"></i>
+                    <span>Wholesale Price List</span>
+                </a>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-3 pt-4 border-t border-slate-100">
+                <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200/60 px-3 py-1.5 rounded-xl text-[10px] font-bold text-slate-600">
+                    <i class="fa-solid fa-truck text-crimson-600 text-[11px]"></i> Lorry Transport Delivery
                 </div>
-                <div class="flex items-center gap-2 bg-slate-100/80 border border-slate-200 px-4 py-2 rounded-xl text-xs font-semibold text-slate-650">
-                    <i class="fa-solid fa-badge-check text-crimson-600"></i> Pure Sulphurless Sparklers
+                <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200/60 px-3 py-1.5 rounded-xl text-[10px] font-bold text-slate-600">
+                    <i class="fa-solid fa-badge-check text-crimson-600 text-[11px]"></i> Sulphurless Sparklers
                 </div>
-                <div class="flex items-center gap-2 bg-slate-100/80 border border-slate-200 px-4 py-2 rounded-xl text-xs font-semibold text-slate-650">
-                    <i class="fa-solid fa-circle-check text-crimson-600"></i> Secure UPI Verification
+                <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200/60 px-3 py-1.5 rounded-xl text-[10px] font-bold text-slate-600">
+                    <i class="fa-solid fa-circle-check text-crimson-600 text-[11px]"></i> Secure UPI Payments
                 </div>
             </div>
         </div>
