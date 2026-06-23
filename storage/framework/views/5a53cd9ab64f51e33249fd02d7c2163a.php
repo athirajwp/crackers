@@ -263,17 +263,30 @@
             </div>
 
             <!-- Rich Text About Us -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-3">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
                 <h3 class="text-xs font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-3 flex items-center gap-1.5">
                     <i class="fa-solid fa-user-tie text-<?php echo e($currentTheme['accent']); ?>"></i> About Us Settings
                 </h3>
-                
-                <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Add About Us</label>
-                <!-- Editor Container -->
-                <div class="rounded-xl overflow-hidden border border-slate-200">
-                    <div id="about-editor" class="h-64 bg-slate-50/20 text-xs font-semibold">
-                        <?php echo $settings['about_us']; ?>
 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="relative mt-2">
+                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">About Us Badge</label>
+                        <input type="text" name="about_us_badge" value="<?php echo e($settings['about_us_badge'] ?? ''); ?>" placeholder="e.g. A Decade of Quality" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                    </div>
+                    <div class="relative mt-2">
+                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">About Us Title</label>
+                        <input type="text" name="about_us_title" value="<?php echo e($settings['about_us_title'] ?? ''); ?>" placeholder="e.g. We Provide Premium Quality Fireworks" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                    </div>
+                </div>
+                
+                <div class="space-y-1">
+                    <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">About Us Rich Content</label>
+                    <!-- Editor Container -->
+                    <div class="rounded-xl overflow-hidden border border-slate-200">
+                        <div id="about-editor" class="h-64 bg-slate-50/20 text-xs font-semibold">
+                            <?php echo $settings['about_us']; ?>
+
+                        </div>
                     </div>
                 </div>
                 <input type="hidden" name="about_us" id="about-input">

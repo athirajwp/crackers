@@ -19,6 +19,27 @@
             <p class="text-sm text-slate-550 max-w-xl mx-auto leading-relaxed font-semibold">
                 Reputed and reliable Sivakasi fireworks dealers offering premium quality, highly colorful, and 100% safe crackers for all your celebrations.
             </p>
+            <?php
+                $licName = App\Models\Setting::get('license_name');
+                $licNo = App\Models\Setting::get('license_no');
+            ?>
+            <?php if(!empty($licName) || !empty($licNo)): ?>
+                <div class="inline-flex flex-wrap justify-center items-center gap-x-6 gap-y-2 bg-slate-50 border border-slate-200 px-6 py-3 rounded-2xl shadow-sm text-xs font-bold text-slate-600 max-w-xl mx-auto mt-4">
+                    <?php if(!empty($licName)): ?>
+                        <div class="flex items-center gap-1.5">
+                            <i class="fa-solid fa-scale-balanced text-emerald-600 text-sm"></i>
+                            <span>License Name: <strong class="text-slate-800 font-extrabold"><?php echo e($licName); ?></strong></span>
+                        </div>
+                    <?php endif; ?>
+                    <?php if(!empty($licNo)): ?>
+                        <div class="h-4 w-px bg-slate-350 hidden md:block"></div>
+                        <div class="flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-signature text-crimson-600 text-sm"></i>
+                            <span>License No: <strong class="text-slate-850 font-mono font-black"><?php echo e($licNo); ?></strong></span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </section>
 
@@ -40,35 +61,44 @@
             <!-- Right Column: Content -->
             <div class="space-y-6">
                 <?php
+                    $aboutUsBadge = App\Models\Setting::get('about_us_badge', 'A Decade of Quality');
+                    $aboutUsTitle = App\Models\Setting::get('about_us_title', 'We Provide Premium Quality Fireworks');
                     $aboutUsContent = App\Models\Setting::get('about_us');
                 ?>
 
-                <?php if(!empty(trim(strip_tags($aboutUsContent)))): ?>
-                    <div class="space-y-4">
-                        <div class="space-y-2">
-                            <span class="text-xs font-bold text-crimson-600 uppercase tracking-widest"><i class="fa-solid fa-shield-heart mr-1"></i> A Decade of Quality</span>
-                            <h3 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-tight">About Our Store</h3>
-                        </div>
-                        <div class="text-xs text-slate-600 leading-relaxed font-semibold space-y-4 prose prose-slate">
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <?php if(!empty(trim($aboutUsBadge))): ?>
+                            <span class="text-xs font-bold text-crimson-600 uppercase tracking-widest">
+                                <i class="fa-solid fa-shield-heart mr-1"></i> <?php echo e($aboutUsBadge); ?>
+
+                            </span>
+                        <?php endif; ?>
+                        <?php if(!empty(trim($aboutUsTitle))): ?>
+                            <h3 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-tight">
+                                <?php echo e($aboutUsTitle); ?>
+
+                            </h3>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <?php if(!empty(trim(strip_tags($aboutUsContent)))): ?>
+                        <div class="text-xs text-slate-600 leading-relaxed font-medium space-y-4 prose prose-slate max-w-none">
                             <?php echo $aboutUsContent; ?>
 
                         </div>
-                    </div>
-                <?php else: ?>
-                    <div class="space-y-2">
-                        <span class="text-xs font-bold text-crimson-600 uppercase tracking-widest"><i class="fa-solid fa-shield-heart mr-1"></i> A Decade of Quality</span>
-                        <h3 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-tight">We Provide Premium Quality Fireworks</h3>
-                    </div>
-                    <p class="text-xs text-slate-650 leading-relaxed font-semibold">
-                        We are a highly reputed and reliable name involved in the field of Fireworks trading business for the past 10 years. 
-                    </p>
-                    <p class="text-xs text-slate-500 leading-relaxed font-medium">
-                        We offer a wide range of fireworks products such as Sparklers, Ground Chakkars, Twinkling Stars, Chorsa, Rockets, Flower Pots, Pencils, Atom Bombs, Colour Matches, and other Fancy Aerial Items. We also offer standard and customized fireworks gift boxes at highly competitive Sivakasi wholesale prices.
-                    </p>
-                    <p class="text-xs text-slate-500 leading-relaxed font-medium">
-                        Through websites, instant WhatsApp checkouts, and modern logistic systems, we are able to process, pack, and ship your orders to Kerala, Karnataka, Andhra, Telangana, and Tamilnadu faster, safer, and on-time to your complete satisfaction.
-                    </p>
-                <?php endif; ?>
+                    <?php else: ?>
+                        <p class="text-xs text-slate-650 leading-relaxed font-semibold">
+                            We are a highly reputed and reliable name involved in the field of Fireworks trading business for the past 10 years. 
+                        </p>
+                        <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                            We offer a wide range of fireworks products such as Sparklers, Ground Chakkars, Twinkling Stars, Chorsa, Rockets, Flower Pots, Pencils, Atom Bombs, Colour Matches, and other Fancy Aerial Items. We also offer standard and customized fireworks gift boxes at highly competitive Sivakasi wholesale prices.
+                        </p>
+                        <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                            Through websites, instant WhatsApp checkouts, and modern logistic systems, we are able to process, pack, and ship your orders to Kerala, Karnataka, Andhra, Telangana, and Tamilnadu faster, safer, and on-time to your complete satisfaction.
+                        </p>
+                    <?php endif; ?>
+                </div>
                 
                 <div class="pt-4 border-t border-slate-100 flex flex-wrap gap-6 text-xs text-slate-650 font-bold">
                     <div class="flex items-center gap-2">
@@ -181,6 +211,43 @@
                 </div>
             </div>
 
+    </section>
+
+    <!-- 4.5. Premium Booking Terms & Conditions Section -->
+    <section class="container mx-auto px-4 py-12 border-t border-slate-200">
+        <div class="bg-white border border-slate-200 rounded-3xl p-6 md:p-10 shadow-sm relative overflow-hidden">
+            <div class="absolute -right-24 -top-24 w-64 h-64 bg-slate-50/50 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <div class="space-y-6">
+                <div class="space-y-2 border-b border-slate-100 pb-4">
+                    <span class="text-xs font-bold text-crimson-600 uppercase tracking-widest"><i class="fa-solid fa-scale-balanced mr-1"></i> Terms & Policies</span>
+                    <h3 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-tight">Terms & Conditions</h3>
+                    <p class="text-xs text-slate-550 max-w-xl leading-relaxed font-semibold">
+                        Please review our official terms, payment policies, delivery frameworks, and transport conditions before placing your fireworks booking.
+                    </p>
+                </div>
+
+                <div class="prose prose-slate max-w-none text-xs leading-relaxed space-y-4 text-slate-600 font-medium">
+                    <?php
+                        $termsContent = App\Models\Setting::get('terms_conditions');
+                    ?>
+
+                    <?php if(!empty(trim(strip_tags($termsContent)))): ?>
+                        <?php echo $termsContent; ?>
+
+                    <?php else: ?>
+                        <!-- High-fidelity premium default terms fallback -->
+                        <div class="space-y-6 text-slate-550">
+                            <p><strong>1. Booking Eligibility & Order Guidelines:</strong> By placing an order on our online booking storefront, you confirm that you are at least 18 years of age and authorized to purchase fireworks products in your local jurisdiction.</p>
+                            <p>All items added to your cart represent Sivakasi wholesale stock and are subject to availability. The minimum purchase value to qualify for transport delivery is strictly <strong>₹<?php echo e(number_format(App\Models\Setting::get('min_order_value', 3800))); ?></strong> (net payable value after flat discounts are calculated).</p>
+                            <p><strong>2. Pricing, Discounts & Wholesale Schemes:</strong> All products listed indicate their Maximum Retail Price (MRP) alongside our discounted Sivakasi wholesale rate (a standard <strong><?php echo e(App\Models\Setting::get('discount_percent', 60)); ?>% off</strong>).</p>
+                            <p><strong>3. Payment Terms & Instant UPI Verification:</strong> We operate strictly on a 100% advance payment model due to transport agency rules. A secure invoice containing our official QR code and UPI address is generated. You are requested to complete the transaction and click the WhatsApp confirmation link to share your receipt screenshot.</p>
+                            <p><strong>4. Shipping, Lorry Transports & Delivery:</strong> All bookings are securely packed and shipped via licensed <strong>Lorry Transport Services</strong> to your nearest transport hub/godown.</p>
+                            <p><strong>5. Safety & Liability:</strong> Firecrackers are inherently chemical materials. Please exercise extreme caution. Always supervise children, wear cotton garments, keep a bucket of water adjacent, and follow all safety guidelines.</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -253,6 +320,31 @@
                             </p>
                         </div>
                     </a>
+
+                    <!-- License Card (Government Explosive License) -->
+                    <?php
+                        $licNameCard = App\Models\Setting::get('license_name');
+                        $licNoCard = App\Models\Setting::get('license_no');
+                    ?>
+                    <?php if(!empty($licNameCard) || !empty($licNoCard)): ?>
+                        <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-slate-50 text-slate-600 flex items-center justify-center flex-shrink-0 border border-slate-150">
+                                <i class="fa-solid fa-scale-balanced text-base"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest">Government Explosive License</h4>
+                                <p class="text-xs text-slate-700 leading-normal font-bold">
+                                    <?php if(!empty($licNameCard)): ?>
+                                        <?php echo e($licNameCard); ?>
+
+                                    <?php endif; ?>
+                                    <?php if(!empty($licNoCard)): ?>
+                                        <span class="block text-[10px] text-slate-500 font-mono font-semibold mt-0.5">License No: <?php echo e($licNoCard); ?></span>
+                                    <?php endif; ?>
+                                </p>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
