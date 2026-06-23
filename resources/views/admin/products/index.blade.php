@@ -270,7 +270,7 @@
 
                         <div>
                             <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Inventory Category</label>
-                            <select name="category_id" required :value="editItem.category_id" class="w-full bg-slate-55 border border-slate-200 focus:border-slate-350 focus:bg-white rounded-xl px-3 py-2 text-slate-700 focus:outline-none transition-all">
+                            <select name="category_id" required x-model="editItem.category_id" class="w-full bg-slate-55 border border-slate-200 focus:border-slate-350 focus:bg-white rounded-xl px-3 py-2 text-slate-700 focus:outline-none transition-all">
                                 @foreach($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
                                 @endforeach
@@ -295,7 +295,7 @@
                             </div>
                             <div>
                                 <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Activity Status</label>
-                                <select name="status" required :value="editItem.status" class="w-full bg-slate-55 border border-slate-200 focus:border-slate-350 focus:bg-white rounded-xl px-3 py-2 text-slate-700 focus:outline-none transition-all">
+                                <select name="status" required x-model="editItem.status" class="w-full bg-slate-55 border border-slate-200 focus:border-slate-350 focus:bg-white rounded-xl px-3 py-2 text-slate-700 focus:outline-none transition-all">
                                     <option value="active">Active</option>
                                     <option value="inactive">Inactive</option>
                                 </select>

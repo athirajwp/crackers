@@ -23,9 +23,7 @@ class BrandingController extends Controller
             'admin_theme', 'banner_scroller',
             'terms_conditions', 'about_us',
             'slider_image_1', 'slider_image_2', 'slider_image_3',
-            'banner_image_1', 'banner_image_2', 'banner_image_3',
-            'aboutus_image_1', 'aboutus_image_2', 'aboutus_image_3',
-            'offer_image_1', 'offer_image_2', 'offer_image_3',
+            'aboutus_image_1',
             'store_address', 'store_phone', 'store_email',
             'bank_name', 'bank_ifsc', 'bank_acc_no', 'bank_holder', 'bank_branch', 'bank_acc_type',
             'license_name', 'license_no', 'store_map_iframe',
@@ -50,7 +48,7 @@ class BrandingController extends Controller
     public function update(Request $request)
     {
         // 1. Handle all text / text-area input fields
-        $fields = $request->except(['_token', 'slider_image_1', 'slider_image_2', 'slider_image_3', 'banner_image_1', 'banner_image_2', 'banner_image_3', 'aboutus_image_1', 'aboutus_image_2', 'aboutus_image_3', 'offer_image_1', 'offer_image_2', 'offer_image_3']);
+        $fields = $request->except(['_token', 'slider_image_1', 'slider_image_2', 'slider_image_3', 'aboutus_image_1']);
 
         foreach ($fields as $key => $value) {
             $type = 'text';
@@ -60,13 +58,25 @@ class BrandingController extends Controller
             Setting::set($key, $value, $type);
         }
 
+        // Sync theme with the central Company model record
+        if ($request->has('theme')) {
+            $company = view()->shared('currentCompany');
+            if ($company) {
+                $company->update(['theme' => $request->theme]);
+            }
+        }
+
+
         // 2. Handle all file uploads dynamically
         $imageFields = [
             'slider_image_1', 'slider_image_2', 'slider_image_3',
-            'banner_image_1', 'banner_image_2', 'banner_image_3',
-            'aboutus_image_1', 'aboutus_image_2', 'aboutus_image_3',
-            'offer_image_1', 'offer_image_2', 'offer_image_3',
+            'aboutus_image_1',
         ];
+
+        $company = view()->shared('currentCompany');
+        $companyCode = $company ? $company->code : 'default';
+        $companyCodeClean = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $companyCode));
+        $uploadDir = "uploads/companies/{$companyCodeClean}/branding";
 
         foreach ($imageFields as $field) {
             if ($request->hasFile($field)) {
@@ -80,8 +90,8 @@ class BrandingController extends Controller
                 }
 
                 $fileName = time() . '_' . $field . '_' . uniqid() . '.' . $request->file($field)->extension();
-                $request->file($field)->move(public_path('uploads/branding'), $fileName);
-                $filePath = 'uploads/branding/' . $fileName;
+                $request->file($field)->move(public_path($uploadDir), $fileName);
+                $filePath = $uploadDir . '/' . $fileName;
 
                 Setting::set($field, $filePath, 'text');
             }

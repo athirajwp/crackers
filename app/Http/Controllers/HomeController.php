@@ -29,6 +29,25 @@ class HomeController extends Controller
             'store_phone' => Setting::get('store_phone', '+91 9998887776'),
             'store_email' => Setting::get('store_email', 'crackerdemo@gmail.com'),
             'store_address' => Setting::get('store_address', 'Virudhunagar to Sivakasi Main Road, Sivakasi'),
+            
+            // Feature configurations
+            'enable_min_order' => Setting::get('enable_min_order', 'yes'),
+            'enable_promo_codes' => Setting::get('enable_promo_codes', 'yes'),
+            'enable_tax_delivery' => Setting::get('enable_tax_delivery', 'no'),
+            'tax_percent' => Setting::get('tax_percent', 18),
+            'delivery_charge' => Setting::get('delivery_charge', 150),
+
+            // Promo codes for front-end validation
+            'promo_code_1' => Setting::get('promo_code_1', ''),
+            'promo_value_1' => Setting::get('promo_value_1', ''),
+            'promo_code_2' => Setting::get('promo_code_2', ''),
+            'promo_value_2' => Setting::get('promo_value_2', ''),
+            'promo_code_3' => Setting::get('promo_code_3', ''),
+            'promo_value_3' => Setting::get('promo_value_3', ''),
+            'promo_code_4' => Setting::get('promo_code_4', ''),
+            'promo_value_4' => Setting::get('promo_value_4', ''),
+            'promo_code_5' => Setting::get('promo_code_5', ''),
+            'promo_value_5' => Setting::get('promo_value_5', ''),
         ];
 
         return view('storefront', compact('categories', 'settings'));

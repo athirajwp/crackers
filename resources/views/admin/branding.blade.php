@@ -1,27 +1,19 @@
 @php
-    $theme = App\Models\Setting::get('admin_theme', 'gold');
+    $activeTheme = $currentCompany?->theme ?? 'Theme_1';
     
-    // Set theme classes
-    $themeClasses = [
-        'gold' => [
+    $isLightTheme = in_array(strtolower($activeTheme), ['theme_1']);
+    
+    if ($isLightTheme) {
+        $currentTheme = [
             'active' => 'bg-gold-500 text-slate-950',
             'accent' => 'gold-500'
-        ],
-        'blue' => [
-            'active' => 'bg-blue-600 text-white shadow-md shadow-blue-500/20',
-            'accent' => 'blue-600'
-        ],
-        'crimson' => [
+        ];
+    } else {
+        $currentTheme = [
             'active' => 'bg-crimson-600 text-white shadow-md shadow-crimson-500/20',
             'accent' => 'crimson-600'
-        ],
-        'emerald' => [
-            'active' => 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20',
-            'accent' => 'emerald-600'
-        ]
-    ];
-    
-    $currentTheme = $themeClasses[$theme] ?? $themeClasses['gold'];
+        ];
+    }
 @endphp
 @extends('layouts.admin')
 
@@ -214,12 +206,18 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="space-y-1.5">
-                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Admin Theme</label>
-                        <select name="admin_theme" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2.5 text-slate-700 focus:outline-none transition-all">
-                            <option value="gold" {{ $settings['admin_theme'] === 'gold' ? 'selected' : '' }}>Gold</option>
-                            <option value="blue" {{ $settings['admin_theme'] === 'blue' ? 'selected' : '' }}>Blue</option>
-                            <option value="crimson" {{ $settings['admin_theme'] === 'crimson' ? 'selected' : '' }}>Crimson</option>
-                            <option value="emerald" {{ $settings['admin_theme'] === 'emerald' ? 'selected' : '' }}>Emerald</option>
+                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Website Theme</label>
+                        <select name="theme" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2.5 text-slate-700 focus:outline-none transition-all">
+                            <option value="Theme_1" {{ ($currentCompany?->theme ?? 'Theme_1') === 'Theme_1' ? 'selected' : '' }}>Crimson Red & Gold (Theme 1)</option>
+                            <option value="Theme_2" {{ ($currentCompany?->theme ?? 'Theme_1') === 'Theme_2' ? 'selected' : '' }}>Indigo Blue & Amber (Theme 2)</option>
+                            <option value="Theme_3" {{ ($currentCompany?->theme ?? 'Theme_1') === 'Theme_3' ? 'selected' : '' }}>Emerald Green & Orange (Theme 3)</option>
+                            <option value="Theme_4" {{ ($currentCompany?->theme ?? 'Theme_1') === 'Theme_4' ? 'selected' : '' }}>Purple & Yellow (Theme 4)</option>
+                            <option value="Theme_5" {{ ($currentCompany?->theme ?? 'Theme_1') === 'Theme_5' ? 'selected' : '' }}>Rose Pink & Teal (Theme 5)</option>
+                            <option value="Theme_6" {{ ($currentCompany?->theme ?? 'Theme_1') === 'Theme_6' ? 'selected' : '' }}>Cyan & Red-Orange (Theme 6)</option>
+                            <option value="Theme_7" {{ ($currentCompany?->theme ?? 'Theme_1') === 'Theme_7' ? 'selected' : '' }}>Forest Green & Gold (Theme 7)</option>
+                            <option value="Theme_8" {{ ($currentCompany?->theme ?? 'Theme_1') === 'Theme_8' ? 'selected' : '' }}>Teal & Rose (Theme 8)</option>
+                            <option value="Theme_9" {{ ($currentCompany?->theme ?? 'Theme_1') === 'Theme_9' ? 'selected' : '' }}>Charcoal & Amber (Theme 9)</option>
+                            <option value="Theme_10" {{ ($currentCompany?->theme ?? 'Theme_1') === 'Theme_10' ? 'selected' : '' }}>Slate Blue & Coral (Theme 10)</option>
                         </select>
                     </div>
                     <div class="space-y-1.5 md:col-span-2">
@@ -309,21 +307,13 @@
                     'title' => 'Home Slider Images',
                     'icon' => 'fa-images',
                     'prefix' => 'slider_image_',
-                ],
-                'banner' => [
-                    'title' => 'Banner Images',
-                    'icon' => 'fa-scroll',
-                    'prefix' => 'banner_image_',
+                    'slots' => 3,
                 ],
                 'about' => [
                     'title' => 'About Us Images',
                     'icon' => 'fa-address-card',
                     'prefix' => 'aboutus_image_',
-                ],
-                'offer' => [
-                    'title' => 'Offer Images',
-                    'icon' => 'fa-tags',
-                    'prefix' => 'offer_image_',
+                    'slots' => 1,
                 ]
             ];
         @endphp
@@ -335,7 +325,10 @@
             </h3>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs font-semibold">
-                @for($slot = 1; $slot <= 3; $slot++)
+                @php
+                    $slotsCount = $section['slots'] ?? 3;
+                @endphp
+                @for($slot = 1; $slot <= $slotsCount; $slot++)
                 @php
                     $field = $section['prefix'] . $slot;
                     $path = $settings[$field];

@@ -69,19 +69,28 @@ class CheckoutController extends Controller
             return response()->json(['error' => 'Your cart is empty!'], 422);
         }
 
+        // Fetch feature flags config
+        $enableMinOrder = Setting::get('enable_min_order', 'yes') === 'yes';
+        $enablePromoCodes = Setting::get('enable_promo_codes', 'yes') === 'yes';
+        $enableTaxDelivery = Setting::get('enable_tax_delivery', 'no') === 'yes';
+        $taxPercent = (float) Setting::get('tax_percent', 18);
+        $deliveryCharge = (float) Setting::get('delivery_charge', 150);
+
         // Validate Minimum Purchase (Must qualify based on original net total before promo discount is evaluated)
-        $minOrder = Setting::get('min_order_value', 3800);
-        if ($netAmount < $minOrder) {
-            return response()->json([
-                'error' => "Minimum order value is ₹{$minOrder}. Your current order is ₹{$netAmount}. Please add more items."
-            ], 422);
+        if ($enableMinOrder) {
+            $minOrder = Setting::get('min_order_value', 3800);
+            if ($netAmount < $minOrder) {
+                return response()->json([
+                    'error' => "Minimum order value is ₹{$minOrder}. Your current order is ₹{$netAmount}. Please add more items."
+                ], 422);
+            }
         }
 
-        // Backend Promo Code validation & calculation
+        // Backend Promo Code validation & calculation (only if enabled)
         $promoDiscount = 0;
         $appliedPromo = null;
 
-        if ($request->filled('promo_code')) {
+        if ($enablePromoCodes && $request->filled('promo_code')) {
             $submittedCode = strtoupper(trim($request->input('promo_code')));
             for ($i = 1; $i <= 5; $i++) {
                 $codeSetting = strtoupper(trim(Setting::get("promo_code_{$i}", '')));
@@ -106,12 +115,25 @@ class CheckoutController extends Controller
         }
 
         $originalNet = $netAmount;
-        $netAmount = max(0, $originalNet - $promoDiscount);
+        $postPromoNet = max(0, $originalNet - $promoDiscount);
+
+        // Calculate tax and delivery
+        $taxAmount = 0;
+        $deliveryChargeVal = 0;
+        if ($enableTaxDelivery) {
+            $taxAmount = $postPromoNet * ($taxPercent / 100);
+            $deliveryChargeVal = $deliveryCharge;
+        }
+
+        $finalNet = $postPromoNet + $taxAmount + $deliveryChargeVal;
         $discountAmount = ($subtotal - $originalNet) + $promoDiscount;
 
         $notes = $request->notes;
         if ($appliedPromo) {
             $notes = trim(($notes ? $notes . "\n" : "") . "[Applied Promo Code: {$appliedPromo} (Saved ₹" . number_format($promoDiscount, 2) . " extra discount)]");
+        }
+        if ($enableTaxDelivery) {
+            $notes = trim(($notes ? $notes . "\n" : "") . "[Pricing Breakdown:\n- Net Amount: ₹" . number_format($postPromoNet, 2) . "\n- GST / Tax (" . $taxPercent . "%): ₹" . number_format($taxAmount, 2) . "\n- Delivery Fee: ₹" . number_format($deliveryChargeVal, 2) . "]");
         }
 
         try {
@@ -129,7 +151,7 @@ class CheckoutController extends Controller
                 'pincode' => $request->pincode,
                 'subtotal' => $subtotal,
                 'discount_amount' => $discountAmount,
-                'net_amount' => $netAmount,
+                'net_amount' => $finalNet,
                 'payment_status' => 'pending',
                 'order_status' => 'pending',
                 'notes' => $notes,
@@ -148,6 +170,23 @@ class CheckoutController extends Controller
             }
 
             DB::commit();
+
+            // Send order invoice email to admin and customer in the background
+            try {
+                $orderId = $order->id;
+                $tenantDb = config('database.connections.' . config('database.default') . '.database');
+                if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                    $phpPath = '"' . PHP_BINARY . '"';
+                    $artisanPath = '"' . base_path('artisan') . '"';
+                    pclose(popen("start /B {$phpPath} {$artisanPath} order:send-email {$orderId} --tenant-db={$tenantDb} > NUL 2>&1", "r"));
+                } else {
+                    $phpPath = escapeshellarg(PHP_BINARY);
+                    $artisanPath = escapeshellarg(base_path('artisan'));
+                    exec("{$phpPath} {$artisanPath} order:send-email {$orderId} --tenant-db={$tenantDb} > /dev/null 2>&1 &");
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to dispatch background email: ' . $e->getMessage());
+            }
 
             return response()->json([
                 'success' => true,
@@ -177,8 +216,13 @@ class CheckoutController extends Controller
         $encodedStoreName = urlencode($storeName);
         $upiPayUrl = "upi://pay?pa={$upiId}&pn={$encodedStoreName}&am={$order->net_amount}&cu=INR";
         
-        // Use Google Charts API to render QR Code representing this UPI string
-        $qrCodeUrl = "https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=" . urlencode($upiPayUrl) . "&choe=UTF-8";
+        // Check if custom uploaded UPI QR code exists, otherwise generate dynamically
+        $customQr = Setting::get('store_upi_qr', '');
+        if (!empty($customQr) && file_exists(public_path($customQr))) {
+            $qrCodeUrl = '/' . $customQr;
+        } else {
+            $qrCodeUrl = "https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=" . urlencode($upiPayUrl) . "&choe=UTF-8";
+        }
 
         $bankDetails = [
             'name' => Setting::get('bank_name', 'State Bank of India'),
@@ -198,6 +242,29 @@ class CheckoutController extends Controller
         
         $whatsappUrl = "https://api.whatsapp.com/send?phone={$whatsappNum}&text=" . urlencode($waMessage);
 
-        return view('checkout_success', compact('order', 'qrCodeUrl', 'bankDetails', 'whatsappUrl', 'whatsappNum'));
+        // Build the pre-filled invoice message for customer's WhatsApp
+        $waMessageCustomer = "Hello *" . $order->name . "*,\n\n"
+                           . "Here is the invoice summary for your order at *" . $storeName . "*:\n\n"
+                           . "*Order Number:* " . $order->order_number . "\n"
+                           . "*Order Date:* " . $order->created_at->format('d M Y, h:i A') . "\n"
+                           . "*Net Amount:* ₹" . number_format($order->net_amount, 2) . "\n"
+                           . "*Order Status:* " . ucfirst($order->order_status) . "\n"
+                           . "*Payment Status:* " . ucfirst($order->payment_status) . "\n\n"
+                           . "*Order Items Summary:*\n";
+        
+        foreach($order->items as $item) {
+            $waMessageCustomer .= "• " . $item->product_name . " (Qty: " . $item->quantity . ") - ₹" . number_format($item->total_price, 2) . "\n";
+        }
+        
+        $waMessageCustomer .= "\nTrack your order here: " . route('track.index', ['query' => $order->order_number]) . "\n\n"
+                            . "Thank you for booking with us!";
+        
+        $customerPhone = preg_replace('/[^0-9]/', '', $order->whatsapp ?: $order->phone);
+        if (strlen($customerPhone) === 10) {
+            $customerPhone = '91' . $customerPhone;
+        }
+        $customerWhatsappUrl = "https://api.whatsapp.com/send?phone=" . $customerPhone . "&text=" . urlencode($waMessageCustomer);
+
+        return view('checkout_success', compact('order', 'qrCodeUrl', 'bankDetails', 'whatsappUrl', 'whatsappNum', 'customerWhatsappUrl'));
     }
 }

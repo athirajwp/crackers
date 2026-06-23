@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('title', 'Manage Orders | Admin Console'); ?>
 
 <?php $__env->startSection('content'); ?>

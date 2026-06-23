@@ -70,6 +70,11 @@
     ];
     
     $currentTheme = $themeClasses[$theme] ?? $themeClasses['gold'];
+
+    $superAdminUsername = App\Models\Setting::get('super_admin_username');
+    if (!$superAdminUsername) {
+        $superAdminUsername = env('SUPER_ADMIN_USERNAME', 'superadmin');
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -205,20 +210,17 @@
                     <div class="w-8 h-8 rounded-lg bg-white/20 border border-white/30 overflow-hidden flex items-center justify-center">
                         <i class="fa-solid fa-user text-sm"></i>
                     </div>
-                    <span class="hidden sm:inline text-xs font-bold uppercase tracking-wider">sadmin</span>
+                    <span class="hidden sm:inline text-xs font-bold uppercase tracking-wider"><?php echo e($superAdminUsername); ?></span>
                     <i class="fa-solid fa-chevron-down text-[10px] opacity-80 transition-transform" :class="userOpen ? 'rotate-180' : 'rotate-0'"></i>
                 </button>
                 
                 <!-- Dropdown items -->
                 <div x-show="userOpen" @click.away="userOpen = false" x-transition class="absolute right-0 mt-2 w-48 bg-white text-slate-800 rounded-2xl shadow-xl border border-slate-100 py-2 text-xs font-semibold" style="display: none;">
-                    <a href="/admin/dashboard" class="flex items-center gap-2 px-4 py-2.5 hover:bg-slate-50 transition-colors">
-                        <i class="fa-solid fa-chart-line <?php echo e($currentTheme['text']); ?>"></i> Admin Panel
-                    </a>
-                    <a href="/admin/branding" class="flex items-center gap-2 px-4 py-2.5 hover:bg-slate-50 transition-colors">
-                        <i class="fa-solid fa-globe <?php echo e($currentTheme['text']); ?>"></i> Site Branding
+                    <a href="<?php echo e(route('admin_sys.profile')); ?>" class="flex items-center gap-2 px-4 py-2.5 hover:bg-slate-50 transition-colors">
+                        <i class="fa-solid fa-user-shield <?php echo e($currentTheme['text']); ?>"></i> Console Profile
                     </a>
                     <hr class="border-slate-100 my-1">
-                    <form action="/admin/logout" method="POST" class="w-full">
+                    <form action="<?php echo e(route('admin_sys.logout')); ?>" method="POST" class="w-full">
                         <?php echo csrf_field(); ?>
                         <button type="submit" class="w-full text-left flex items-center gap-2 px-4 py-2.5 hover:bg-rose-50 text-crimson-600 transition-colors">
                             <i class="fa-solid fa-power-off"></i> System Logout
@@ -247,15 +249,22 @@
 
                 <!-- Navigation links -->
                 <nav class="space-y-1.5">
-                    <a href="<?php echo e(route('admin_sys.company.index')); ?>" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold <?php echo e($currentTheme['sidebar_active']); ?>">
+                    <a href="<?php echo e(route('admin_sys.company.index')); ?>" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold <?php echo e(request()->routeIs('admin_sys.company.index') ? $currentTheme['sidebar_active'] : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'); ?> transition-all">
                         <i class="fa-solid fa-network-wired text-sm"></i>
                         <span>Website Overview</span>
                     </a>
-                    
-                    <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition-all">
-                        <i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>
-                        <span>Return to Admin Panel</span>
+
+                    <a href="<?php echo e(route('admin_sys.profile')); ?>" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold <?php echo e(request()->routeIs('admin_sys.profile') ? $currentTheme['sidebar_active'] : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'); ?> transition-all">
+                        <i class="fa-solid fa-user-shield text-sm"></i>
+                        <span>Super Admin Profile</span>
                     </a>
+                    <form action="<?php echo e(route('admin_sys.logout')); ?>" method="POST" class="w-full">
+                        <?php echo csrf_field(); ?>
+                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-all text-left">
+                            <i class="fa-solid fa-power-off text-sm"></i>
+                            <span>Console Logout</span>
+                        </button>
+                    </form>
                 </nav>
             </div>
 

@@ -15,21 +15,94 @@ class CategoryAndProductSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Seed Store Settings
+        // 1. Determine active company from database name
+        $dbConnName = \Illuminate\Support\Facades\DB::getDefaultConnection();
+        $dbName = config("database.connections.{$dbConnName}.database");
+        
+        $company = null;
+        if ($dbName && str_starts_with($dbName, 'crackers_')) {
+            $code = str_replace('crackers_', '', $dbName);
+            try {
+                $company = \Illuminate\Support\Facades\DB::connection('central')
+                    ->table('companies')
+                    ->where('code', $code)
+                    ->first();
+            } catch (\Exception $e) {
+                // Central DB or connection not ready
+            }
+        }
+
+        // 2. Set dynamic parameters derived from central record or defaults
+        $storeName = $company ? $company->name : 'Cracker Demo';
+        $storePhone = $company ? ($company->contact_1 ?: '+91 9998887776') : '+91 9998887776';
+        $storeEmail = $company ? ($company->email_1 ?: 'crackerdemo@gmail.com') : 'crackerdemo@gmail.com';
+        $storeAddress = $company ? ($company->address_1 ?: 'Virudhunagar to Sivakasi Main Road, Sivakasi') : 'Virudhunagar to Sivakasi Main Road, Sivakasi';
+        
+        $storeWhatsapp = '919998887776';
+        if ($company) {
+            $wa = $company->wa_link ?: $company->contact_1;
+            if ($wa) {
+                $cleanWa = preg_replace('/[^0-9]/', '', $wa);
+                if (!empty($cleanWa)) {
+                    $storeWhatsapp = $cleanWa;
+                }
+            }
+        }
+
+        $bankName = $company ? ($company->bank_name_1 ?: 'State Bank of India') : 'State Bank of India';
+        $bankAccNo = $company ? ($company->bank_acc_1 ?: '1234567890') : '1234567890';
+        $bankIfsc = $company ? ($company->bank_ifsc_1 ?: 'SBIN0000123') : 'SBIN0000123';
+        $bankHolder = $company ? ($company->bank_holder_1 ?: $storeName) : 'Cracker Demo';
+        $minPurchase = $company ? ($company->min_purchase ?: '3800') : '3800';
+
         $settings = [
-            'store_name' => ['value' => 'Cracker Demo', 'type' => 'text'],
-            'min_order_value' => ['value' => '3800', 'type' => 'number'],
+            'store_name' => ['value' => $storeName, 'type' => 'text'],
+            'min_order_value' => ['value' => $minPurchase, 'type' => 'number'],
             'discount_percent' => ['value' => '60', 'type' => 'number'],
-            'store_whatsapp' => ['value' => '919998887776', 'type' => 'text'],
-            'store_phone' => ['value' => '+91 9998887776', 'type' => 'text'],
-            'store_email' => ['value' => 'crackerdemo@gmail.com', 'type' => 'text'],
-            'store_address' => ['value' => 'Virudhunagar to Sivakasi Main Road, Sivakasi', 'type' => 'textarea'],
-            'store_upi' => ['value' => 'aathishacrackers@okaxis', 'type' => 'text'],
-            'bank_name' => ['value' => 'State Bank of India', 'type' => 'text'],
-            'bank_acc_no' => ['value' => '1234567890', 'type' => 'text'],
-            'bank_ifsc' => ['value' => 'SBIN0000123', 'type' => 'text'],
-            'bank_holder' => ['value' => 'Cracker Demo', 'type' => 'text'],
+            'store_whatsapp' => ['value' => $storeWhatsapp, 'type' => 'text'],
+            'store_phone' => ['value' => $storePhone, 'type' => 'text'],
+            'store_email' => ['value' => $storeEmail, 'type' => 'text'],
+            'store_address' => ['value' => $storeAddress, 'type' => 'textarea'],
+            'store_upi' => ['value' => $company ? ($company->bank_acc_1 . '@okaxis') : 'aathishacrackers@okaxis', 'type' => 'text'],
+            'bank_name' => ['value' => $bankName, 'type' => 'text'],
+            'bank_acc_no' => ['value' => $bankAccNo, 'type' => 'text'],
+            'bank_ifsc' => ['value' => $bankIfsc, 'type' => 'text'],
+            'bank_holder' => ['value' => $bankHolder, 'type' => 'text'],
         ];
+
+        // Seed promotional codes if defined in company record
+        if ($company) {
+            for ($i = 1; $i <= 5; $i++) {
+                $codeField = "promo_code_{$i}";
+                $valField = "promo_value_{$i}";
+                if (!empty($company->{$codeField})) {
+                    $settings[$codeField] = ['value' => $company->{$codeField}, 'type' => 'text'];
+                }
+                if (!empty($company->{$valField})) {
+                    $settings[$valField] = ['value' => $company->{$valField}, 'type' => 'text'];
+                }
+            }
+            // Seed socials
+            $socialMap = [
+                'facebook_link' => 'fb_link',
+                'twitter_link' => 'tw_link',
+                'youtube_link' => 'yt_link',
+                'whatsapp_link' => 'wa_link',
+                'instagram_link' => 'ig_link',
+            ];
+            foreach ($socialMap as $settingKey => $compField) {
+                if (!empty($company->{$compField})) {
+                    $settings[$settingKey] = ['value' => $company->{$compField}, 'type' => 'text'];
+                }
+            }
+            // Seed theme and banners
+            if (!empty($company->theme)) {
+                $settings['admin_theme'] = ['value' => $company->theme === 'Theme_1' ? 'gold' : ($company->theme === 'Theme_2' ? 'blue' : ($company->theme === 'Theme_3' ? 'emerald' : 'gold')), 'type' => 'text'];
+            }
+            if (!empty($company->tagline)) {
+                $settings['banner_scroller'] = ['value' => $company->tagline, 'type' => 'text'];
+            }
+        }
 
         foreach ($settings as $key => $data) {
             Setting::updateOrCreate(
@@ -37,6 +110,7 @@ class CategoryAndProductSeeder extends Seeder
                 ['value' => $data['value'], 'type' => $data['type']]
             );
         }
+
 
         // 2. Seed Categories and Products
         $inventory = [

@@ -1,27 +1,19 @@
 <?php
-    $theme = App\Models\Setting::get('admin_theme', 'gold');
+    $activeTheme = $currentCompany?->theme ?? 'Theme_1';
     
-    // Set theme classes
-    $themeClasses = [
-        'gold' => [
+    $isLightTheme = in_array(strtolower($activeTheme), ['theme_1']);
+    
+    if ($isLightTheme) {
+        $currentTheme = [
             'active' => 'bg-gold-500 text-slate-950',
             'accent' => 'gold-500'
-        ],
-        'blue' => [
-            'active' => 'bg-blue-600 text-white shadow-md shadow-blue-500/20',
-            'accent' => 'blue-600'
-        ],
-        'crimson' => [
+        ];
+    } else {
+        $currentTheme = [
             'active' => 'bg-crimson-600 text-white shadow-md shadow-crimson-500/20',
             'accent' => 'crimson-600'
-        ],
-        'emerald' => [
-            'active' => 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20',
-            'accent' => 'emerald-600'
-        ]
-    ];
-    
-    $currentTheme = $themeClasses[$theme] ?? $themeClasses['gold'];
+        ];
+    }
 ?>
 
 
@@ -77,6 +69,14 @@
                     <div class="relative lg:col-span-2">
                         <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Email<span class="text-crimson-600">*</span></label>
                         <input type="email" name="store_email" value="<?php echo e($settings['store_email']); ?>" required class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-<?php echo e($currentTheme['accent']); ?> focus:outline-none transition-all">
+                    </div>
+                </div>
+
+                <!-- Row 1.5: Google Map Embed Iframe -->
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="relative">
+                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Google Map Iframe Code</label>
+                        <textarea name="store_map_iframe" rows="2" placeholder="Paste your Google Maps iframe embed code here (e.g., <iframe src='...'></iframe>)" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-<?php echo e($currentTheme['accent']); ?> focus:outline-none transition-all font-mono"><?php echo e($settings['store_map_iframe'] ?? ''); ?></textarea>
                     </div>
                 </div>
 
@@ -206,17 +206,41 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="space-y-1.5">
-                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Admin Theme</label>
-                        <select name="admin_theme" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-slate-700 focus:outline-none transition-all">
-                            <option value="gold" <?php echo e($settings['admin_theme'] === 'gold' ? 'selected' : ''); ?>>Gold</option>
-                            <option value="blue" <?php echo e($settings['admin_theme'] === 'blue' ? 'selected' : ''); ?>>Blue</option>
-                            <option value="crimson" <?php echo e($settings['admin_theme'] === 'crimson' ? 'selected' : ''); ?>>Crimson</option>
-                            <option value="emerald" <?php echo e($settings['admin_theme'] === 'emerald' ? 'selected' : ''); ?>>Emerald</option>
+                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Website Theme</label>
+                        <select name="theme" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-slate-700 focus:outline-none transition-all">
+                            <option value="Theme_1" <?php echo e(($currentCompany?->theme ?? 'Theme_1') === 'Theme_1' ? 'selected' : ''); ?>>Crimson Red & Gold (Theme 1)</option>
+                            <option value="Theme_2" <?php echo e(($currentCompany?->theme ?? 'Theme_1') === 'Theme_2' ? 'selected' : ''); ?>>Indigo Blue & Amber (Theme 2)</option>
+                            <option value="Theme_3" <?php echo e(($currentCompany?->theme ?? 'Theme_1') === 'Theme_3' ? 'selected' : ''); ?>>Emerald Green & Orange (Theme 3)</option>
+                            <option value="Theme_4" <?php echo e(($currentCompany?->theme ?? 'Theme_1') === 'Theme_4' ? 'selected' : ''); ?>>Purple & Yellow (Theme 4)</option>
+                            <option value="Theme_5" <?php echo e(($currentCompany?->theme ?? 'Theme_1') === 'Theme_5' ? 'selected' : ''); ?>>Rose Pink & Teal (Theme 5)</option>
+                            <option value="Theme_6" <?php echo e(($currentCompany?->theme ?? 'Theme_1') === 'Theme_6' ? 'selected' : ''); ?>>Cyan & Red-Orange (Theme 6)</option>
+                            <option value="Theme_7" <?php echo e(($currentCompany?->theme ?? 'Theme_1') === 'Theme_7' ? 'selected' : ''); ?>>Forest Green & Gold (Theme 7)</option>
+                            <option value="Theme_8" <?php echo e(($currentCompany?->theme ?? 'Theme_1') === 'Theme_8' ? 'selected' : ''); ?>>Teal & Rose (Theme 8)</option>
+                            <option value="Theme_9" <?php echo e(($currentCompany?->theme ?? 'Theme_1') === 'Theme_9' ? 'selected' : ''); ?>>Charcoal & Amber (Theme 9)</option>
+                            <option value="Theme_10" <?php echo e(($currentCompany?->theme ?? 'Theme_1') === 'Theme_10' ? 'selected' : ''); ?>>Slate Blue & Coral (Theme 10)</option>
                         </select>
                     </div>
                     <div class="space-y-1.5 md:col-span-2">
                         <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Banner Scroller</label>
                         <input type="text" name="banner_scroller" value="<?php echo e($settings['banner_scroller']); ?>" placeholder="Hurry, stock is running out!" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-slate-700 focus:outline-none transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legal Compliance & License Settings -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-3 flex items-center gap-1.5">
+                    <i class="fa-solid fa-scale-balanced text-[13px] text-<?php echo e($currentTheme['accent']); ?>"></i> Legal & License Settings
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-semibold">
+                    <div class="relative mt-2">
+                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">License Name</label>
+                        <input type="text" name="license_name" value="<?php echo e($settings['license_name'] ?? ''); ?>" placeholder="e.g. Jallikattu Crackers Shop" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                    </div>
+                    <div class="relative mt-2">
+                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">License Number</label>
+                        <input type="text" name="license_no" value="<?php echo e($settings['license_no'] ?? ''); ?>" placeholder="e.g. 123/2024" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
                     </div>
                 </div>
             </div>
@@ -285,21 +309,13 @@
                     'title' => 'Home Slider Images',
                     'icon' => 'fa-images',
                     'prefix' => 'slider_image_',
-                ],
-                'banner' => [
-                    'title' => 'Banner Images',
-                    'icon' => 'fa-scroll',
-                    'prefix' => 'banner_image_',
+                    'slots' => 3,
                 ],
                 'about' => [
                     'title' => 'About Us Images',
                     'icon' => 'fa-address-card',
                     'prefix' => 'aboutus_image_',
-                ],
-                'offer' => [
-                    'title' => 'Offer Images',
-                    'icon' => 'fa-tags',
-                    'prefix' => 'offer_image_',
+                    'slots' => 1,
                 ]
             ];
         ?>
@@ -312,7 +328,10 @@
             </h3>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs font-semibold">
-                <?php for($slot = 1; $slot <= 3; $slot++): ?>
+                <?php
+                    $slotsCount = $section['slots'] ?? 3;
+                ?>
+                <?php for($slot = 1; $slot <= $slotsCount; $slot++): ?>
                 <?php
                     $field = $section['prefix'] . $slot;
                     $path = $settings[$field];

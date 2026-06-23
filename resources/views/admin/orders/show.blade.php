@@ -15,7 +15,34 @@
             <p class="text-[10px] text-slate-450 uppercase tracking-widest leading-none font-bold">Reference: <strong class="text-slate-700 font-mono select-all">{{ $order->order_number }}</strong></p>
         </div>
         
+        @php
+            $storeName = App\Models\Setting::get('store_name', 'Cracker Store');
+            $waMessage = "Hello *" . $order->name . "*,\n\n"
+                       . "Here is the invoice summary for your order at *" . $storeName . "*:\n\n"
+                       . "*Order Number:* " . $order->order_number . "\n"
+                       . "*Order Date:* " . $order->created_at->format('d M Y, h:i A') . "\n"
+                       . "*Net Amount:* ₹" . number_format($order->net_amount, 2) . "\n"
+                       . "*Order Status:* " . ucfirst($order->order_status) . "\n"
+                       . "*Payment Status:* " . ucfirst($order->payment_status) . "\n\n"
+                       . "*Order Items Summary:*\n";
+            
+            foreach($order->items as $item) {
+                $waMessage .= "• " . $item->product_name . " (Qty: " . $item->quantity . ") - ₹" . number_format($item->total_price, 2) . "\n";
+            }
+            
+            $waMessage .= "\nTrack your order here: " . route('track.index', ['query' => $order->order_number]) . "\n\n"
+                        . "Thank you for booking with us!";
+            
+            $targetPhone = preg_replace('/[^0-9]/', '', $order->whatsapp ?: $order->phone);
+            if (strlen($targetPhone) === 10) {
+                $targetPhone = '91' . $targetPhone;
+            }
+            $waUrl = "https://api.whatsapp.com/send?phone=" . $targetPhone . "&text=" . urlencode($waMessage);
+        @endphp
         <div class="flex gap-3">
+            <a href="{{ $waUrl }}" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all active:scale-95">
+                <i class="fa-brands fa-whatsapp text-[13px]"></i> Send WhatsApp Invoice
+            </a>
             <a href="{{ route('admin.orders.invoice', $order->id) }}" target="_blank" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all active:scale-95">
                 <i class="fa-solid fa-file-invoice text-crimson-600"></i> View Retail Invoice
             </a>
@@ -43,14 +70,26 @@
                 </div>
                 <div class="space-y-2.5">
                     <div class="text-slate-400 uppercase tracking-wider text-[10px] font-bold">Contact Particulars</div>
-                    <div class="flex justify-between">
+                    <div class="flex justify-between items-center">
                         <span class="text-slate-500">Contact Mobile:</span>
-                        <strong class="text-slate-800 font-mono select-all">{{ $order->phone }}</strong>
+                        <a href="tel:{{ $order->phone }}" class="text-slate-700 hover:text-crimson-600 hover:underline font-mono select-all font-bold">
+                            {{ $order->phone }} <i class="fa-solid fa-phone text-[10px] ml-1 opacity-70"></i>
+                        </a>
                     </div>
                     @if($order->whatsapp)
-                    <div class="flex justify-between">
+                    <div class="flex justify-between items-center">
                         <span class="text-slate-500">WhatsApp:</span>
-                        <strong class="text-slate-800 font-mono select-all">{{ $order->whatsapp }}</strong>
+                        <a href="{{ $waUrl }}" target="_blank" class="text-emerald-600 hover:underline font-mono select-all font-bold" title="Send WhatsApp Invoice">
+                            {{ $order->whatsapp }} <i class="fa-brands fa-whatsapp text-[11px] ml-1"></i>
+                        </a>
+                    </div>
+                    @endif
+                    @if($order->email)
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500">Contact Email:</span>
+                        <a href="mailto:{{ $order->email }}" class="text-crimson-600 hover:underline font-mono select-all font-bold">
+                            {{ $order->email }} <i class="fa-solid fa-envelope text-[10px] ml-1 opacity-70"></i>
+                        </a>
                     </div>
                     @endif
                     <div class="flex justify-between border-t border-slate-200 pt-2.5">

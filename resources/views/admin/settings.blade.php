@@ -1,27 +1,19 @@
 @php
-    $theme = App\Models\Setting::get('admin_theme', 'gold');
+    $activeTheme = $currentCompany?->theme ?? 'Theme_1';
     
-    // Set theme classes
-    $themeClasses = [
-        'gold' => [
+    $isLightTheme = in_array(strtolower($activeTheme), ['theme_1']);
+    
+    if ($isLightTheme) {
+        $currentTheme = [
             'active' => 'bg-gold-500 text-slate-950',
             'accent' => 'gold-500'
-        ],
-        'blue' => [
-            'active' => 'bg-blue-600 text-white shadow-md shadow-blue-500/20',
-            'accent' => 'blue-600'
-        ],
-        'crimson' => [
+        ];
+    } else {
+        $currentTheme = [
             'active' => 'bg-crimson-600 text-white shadow-md shadow-crimson-500/20',
             'accent' => 'crimson-600'
-        ],
-        'emerald' => [
-            'active' => 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20',
-            'accent' => 'emerald-600'
-        ]
-    ];
-    
-    $currentTheme = $themeClasses[$theme] ?? $themeClasses['gold'];
+        ];
+    }
 @endphp
 @extends('layouts.admin')
 
@@ -49,7 +41,7 @@
     @endif
 
     <!-- Main Config Form -->
-    <form action="{{ route('admin.settings.update') }}" method="POST" class="grid grid-cols-1 lg:grid-cols-2 gap-8 text-xs font-semibold">
+    <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-2 gap-8 text-xs font-semibold">
         @csrf
         
         <!-- Left: General Configurations & Support -->
@@ -93,6 +85,48 @@
                 <textarea name="store_address" required rows="3" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all resize-none">{{ $settings['store_address'] }}</textarea>
             </div>
 
+            <!-- Cart & Feature Toggles -->
+            <div class="border-t border-slate-200 pt-5 space-y-4">
+                <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-toggle-on text-{{ $currentTheme['accent'] }}"></i> Cart & Checkout Features
+                </h4>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Enforce Min Order Value</label>
+                        <select name="enable_min_order" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                            <option value="yes" {{ ($settings['enable_min_order'] ?? 'yes') === 'yes' ? 'selected' : '' }}>Yes (Enforced)</option>
+                            <option value="no" {{ ($settings['enable_min_order'] ?? 'yes') === 'no' ? 'selected' : '' }}>No (Disabled)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Enable Promo Code Input</label>
+                        <select name="enable_promo_codes" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                            <option value="yes" {{ ($settings['enable_promo_codes'] ?? 'yes') === 'yes' ? 'selected' : '' }}>Yes (Show Coupons)</option>
+                            <option value="no" {{ ($settings['enable_promo_codes'] ?? 'yes') === 'no' ? 'selected' : '' }}>No (Hide Coupons)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Enable Tax & Delivery</label>
+                        <select name="enable_tax_delivery" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                            <option value="yes" {{ ($settings['enable_tax_delivery'] ?? 'no') === 'yes' ? 'selected' : '' }}>Yes (Calculate)</option>
+                            <option value="no" {{ ($settings['enable_tax_delivery'] ?? 'no') === 'no' ? 'selected' : '' }}>No (Free / Exclude)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">GST Rate (%)</label>
+                        <input type="number" min="0" max="100" name="tax_percent" value="{{ $settings['tax_percent'] ?? 18 }}" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all font-mono">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Delivery Fee (₹)</label>
+                        <input type="number" min="0" name="delivery_charge" value="{{ $settings['delivery_charge'] ?? 150 }}" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all font-mono">
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- Right: Payment UPI Profiles & Direct Bank details -->
@@ -105,6 +139,19 @@
                     <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Active UPI Payment ID (VPA)</label>
                     <input type="text" name="store_upi" required value="{{ $settings['store_upi'] }}" placeholder="username@bank" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all font-mono">
                     <span class="text-[9px] text-slate-450 block leading-normal px-0.5 font-semibold"><i class="fa-solid fa-circle-info text-{{ $currentTheme['accent'] }}"></i> Used for generating the dynamic GPay/PhonePe scan-to-pay QR codes. Make sure this ID is correct.</span>
+                </div>
+
+                <div class="space-y-1.5 border-t border-slate-200 pt-4">
+                    <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">UPI QR Code Image (Custom Upload)</label>
+                    <div class="flex items-center gap-4">
+                        @if(!empty($settings['store_upi_qr']))
+                            <div class="w-16 h-16 rounded-xl bg-slate-50 border border-slate-200 overflow-hidden flex items-center justify-center text-slate-300 flex-shrink-0 shadow-sm relative group">
+                                <img src="/{{ $settings['store_upi_qr'] }}" class="object-cover w-full h-full">
+                            </div>
+                        @endif
+                        <input type="file" name="store_upi_qr" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2 text-xs text-slate-800 focus:outline-none transition-all">
+                    </div>
+                    <span class="text-[9px] text-slate-450 block leading-normal px-0.5 font-semibold"><i class="fa-solid fa-circle-info text-{{ $currentTheme['accent'] }}"></i> Upload your custom static QR code image to replace the Google Charts auto-generated UPI QR code.</span>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 border-t border-slate-200 pt-4">

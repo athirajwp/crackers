@@ -1,9 +1,11 @@
 @php
-    $theme = App\Models\Setting::get('admin_theme', 'gold');
+    $activeTheme = $currentCompany?->theme ?? 'Theme_1';
     
-    // Set theme classes
-    $themeClasses = [
-        'gold' => [
+    // Map storefront theme to active layout design style (light topbar 'gold' or colored topbar 'crimson')
+    $isLightTheme = in_array(strtolower($activeTheme), ['theme_1']);
+    
+    if ($isLightTheme) {
+        $currentTheme = [
             'active' => 'bg-gold-500 text-slate-950',
             'icon' => 'bg-gold-500 text-slate-950',
             'border' => 'border-gold-500',
@@ -12,40 +14,19 @@
             'topbar' => 'bg-white border-b border-slate-250 h-16 flex items-center justify-between px-6 select-none shadow-sm',
             'topbar_title' => 'text-slate-500',
             'topbar_badge' => 'text-slate-650 font-bold bg-slate-50 border border-slate-200 text-slate-650'
-        ],
-        'blue' => [
-            'active' => 'bg-blue-600 text-white shadow-md shadow-blue-500/20',
-            'icon' => 'bg-blue-500 text-white',
-            'border' => 'border-blue-600',
-            'text' => 'text-blue-600',
-            'accent' => 'blue-600',
-            'topbar' => 'bg-blue-600 border-b border-blue-700 h-16 flex items-center justify-between px-6 select-none shadow-md text-white',
-            'topbar_title' => 'text-white/90',
-            'topbar_badge' => 'text-white font-bold bg-blue-700 border border-blue-500'
-        ],
-        'crimson' => [
+        ];
+    } else {
+        $currentTheme = [
             'active' => 'bg-crimson-600 text-white shadow-md shadow-crimson-500/20',
-            'icon' => 'bg-crimson-500 text-white',
+            'icon' => 'bg-gold-500 text-slate-950',
             'border' => 'border-crimson-600',
             'text' => 'text-crimson-600',
             'accent' => 'crimson-600',
             'topbar' => 'bg-crimson-600 border-b border-crimson-700 h-16 flex items-center justify-between px-6 select-none shadow-md text-white',
             'topbar_title' => 'text-white/90',
             'topbar_badge' => 'text-white font-bold bg-crimson-700 border border-crimson-500'
-        ],
-        'emerald' => [
-            'active' => 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20',
-            'icon' => 'bg-emerald-500 text-white',
-            'border' => 'border-emerald-600',
-            'text' => 'text-emerald-600',
-            'accent' => 'emerald-600',
-            'topbar' => 'bg-emerald-600 border-b border-emerald-700 h-16 flex items-center justify-between px-6 select-none shadow-md text-white',
-            'topbar_title' => 'text-white/90',
-            'topbar_badge' => 'text-white font-bold bg-emerald-700 border border-emerald-500'
-        ]
-    ];
-    
-    $currentTheme = $themeClasses[$theme] ?? $themeClasses['gold'];
+        ];
+    }
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -70,6 +51,232 @@
                         sans: ['Outfit', 'Poppins', 'sans-serif'],
                     },
                     colors: {
+                        @if(strtolower($activeTheme) === 'theme_2')
+                        gold: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                        },
+                        crimson: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        }
+                        @elseif(strtolower($activeTheme) === 'theme_3')
+                        gold: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        },
+                        crimson: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            300: '#6ee7b7',
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        }
+                        @elseif(strtolower($activeTheme) === 'theme_4')
+                        gold: {
+                            50: '#fefce8',
+                            100: '#fef9c3',
+                            200: '#fef08a',
+                            300: '#fde047',
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04',
+                            700: '#a16207',
+                            800: '#854d0e',
+                            900: '#713f12',
+                        },
+                        crimson: {
+                            50: '#faf5ff',
+                            100: '#f3e8ff',
+                            200: '#e9d5ff',
+                            300: '#d8b4fe',
+                            400: '#c084fc',
+                            500: '#a855f7',
+                            600: '#9333ea',
+                            700: '#7e22ce',
+                            800: '#6b21a8',
+                            900: '#581c87',
+                        }
+                        @elseif(strtolower($activeTheme) === 'theme_5')
+                        gold: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        },
+                        crimson: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                            700: '#be123c',
+                            800: '#9f1239',
+                            900: '#881337',
+                        }
+                        @elseif(strtolower($activeTheme) === 'theme_6')
+                        gold: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            200: '#fecaca',
+                            300: '#fca5a5',
+                            400: '#f87171',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                            900: '#7f1d1d',
+                        },
+                        crimson: {
+                            50: '#ecfeff',
+                            100: '#cffafe',
+                            200: '#a5f3fc',
+                            300: '#67e8f9',
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                            700: '#0e7490',
+                            800: '#155e75',
+                            900: '#164e63',
+                        }
+                        @elseif(strtolower($activeTheme) === 'theme_7')
+                        gold: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                        },
+                        crimson: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                        @elseif(strtolower($activeTheme) === 'theme_8')
+                        gold: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                            700: '#be123c',
+                            800: '#9f1239',
+                            900: '#881337',
+                        },
+                        crimson: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        }
+                        @elseif(strtolower($activeTheme) === 'theme_9')
+                        gold: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                        },
+                        crimson: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                        @elseif(strtolower($activeTheme) === 'theme_10')
+                        gold: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        },
+                        crimson: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        }
+                        @else
                         gold: {
                             50: '#fffdf0',
                             100: '#fef7c3',
@@ -94,6 +301,7 @@
                             800: '#9f1313',
                             900: '#831616',
                         }
+                        @endif
                     }
                 }
             }
@@ -177,11 +385,15 @@
                     <i class="fa-solid fa-sliders text-sm"></i>
                     <span>Store Settings</span>
                 </a>
+                <a href="{{ route('admin.profile.edit') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs {{ request()->routeIs('admin.profile.*') ? $currentTheme['active'] : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                    <i class="fa-solid fa-user-gear text-sm"></i>
+                    <span>Admin Profile</span>
+                </a>
             </nav>
 
             <!-- Footer actions inside sidebar -->
             <div class="p-4 border-t border-slate-800/80 space-y-2">
-                <a href="/" target="_blank" class="w-full flex items-center justify-center gap-2 py-2 border border-slate-800 hover:border-slate-700 bg-slate-950 hover:bg-slate-900 rounded-xl text-xs font-bold text-slate-300 transition-colors">
+                <a href="/{{ $currentCompany ? '?company=' . $currentCompany->code : '' }}" target="_blank" class="w-full flex items-center justify-center gap-2 py-2 border border-slate-800 hover:border-slate-700 bg-slate-950 hover:bg-slate-900 rounded-xl text-xs font-bold text-slate-300 transition-colors">
                     <i class="fa-solid fa-globe"></i>
                     <span>Open Front Store</span>
                 </a>
@@ -237,12 +449,16 @@
                     <i class="fa-solid fa-sliders text-sm"></i>
                     <span>Store Settings</span>
                 </a>
+                <a href="{{ route('admin.profile.edit') }}" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs {{ request()->routeIs('admin.profile.*') ? $currentTheme['active'] : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' }} transition-colors">
+                    <i class="fa-solid fa-user-gear text-sm"></i>
+                    <span>Admin Profile</span>
+                </a>
             </nav>
         </div>
 
         <!-- Footer actions inside sidebar -->
         <div class="p-4 border-t border-slate-800/80 space-y-2">
-            <a href="/" target="_blank" class="w-full flex items-center justify-center gap-2 py-2 border border-slate-800 hover:border-slate-700 bg-slate-950 hover:bg-slate-900 rounded-xl text-xs font-bold text-slate-300 transition-colors">
+            <a href="/{{ $currentCompany ? '?company=' . $currentCompany->code : '' }}" target="_blank" class="w-full flex items-center justify-center gap-2 py-2 border border-slate-800 hover:border-slate-700 bg-slate-950 hover:bg-slate-900 rounded-xl text-xs font-bold text-slate-300 transition-colors">
                 <i class="fa-solid fa-globe"></i>
                 <span>Open Front Store</span>
             </a>

@@ -32,29 +32,8 @@
                 <div class="relative bg-white border border-slate-200 p-3.5 rounded-3xl shadow-lg overflow-hidden transform group-hover:scale-[1.01] transition-transform duration-300">
                     <?php
                         $aboutImg1 = App\Models\Setting::get('aboutus_image_1');
-                        $aboutImg2 = App\Models\Setting::get('aboutus_image_2');
-                        $aboutImg3 = App\Models\Setting::get('aboutus_image_3');
                     ?>
-
-                    <?php if($aboutImg1 || $aboutImg2 || $aboutImg3): ?>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="col-span-2 overflow-hidden rounded-xl aspect-[16/10] bg-slate-50 border border-slate-100 shadow-sm">
-                                <img src="/<?php echo e($aboutImg1 ?: ($aboutImg2 ?: $aboutImg3)); ?>" alt="Sivakasi Fireworks Showcase 1" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
-                            </div>
-                            <?php if($aboutImg2): ?>
-                            <div class="overflow-hidden rounded-xl aspect-[4/3] bg-slate-50 border border-slate-100 shadow-sm">
-                                <img src="/<?php echo e($aboutImg2); ?>" alt="Sivakasi Fireworks Showcase 2" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
-                            </div>
-                            <?php endif; ?>
-                            <?php if($aboutImg3): ?>
-                            <div class="overflow-hidden rounded-xl aspect-[4/3] bg-slate-50 border border-slate-100 shadow-sm <?php echo e(!$aboutImg2 ? 'col-span-2' : ''); ?>">
-                                <img src="/<?php echo e($aboutImg3); ?>" alt="Sivakasi Fireworks Showcase 3" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                    <?php else: ?>
-                        <img src="/images/about_showcase.png" alt="Sivakasi Fireworks Showcase" class="w-full h-auto object-cover rounded-2xl">
-                    <?php endif; ?>
+                    <img src="<?php echo e($aboutImg1 ? '/' . $aboutImg1 : '/images/about_showcase.png'); ?>" alt="Sivakasi Fireworks Showcase" class="w-full h-auto object-cover rounded-2xl">
                 </div>
             </div>
 

@@ -12,9 +12,12 @@ class AuthController extends Controller
      */
     public function showLogin()
     {
-        if (session()->has('admin_logged_in')) {
-            return redirect()->route('admin.dashboard');
-        }
+        $company = view()->shared('currentCompany');
+        $companyCode = $company ? $company->code : 'default';
+
+        // Clear existing session to force password authentication
+        session()->forget('admin_logged_in_' . $companyCode);
+
         return view('admin.login');
     }
 
@@ -27,14 +30,28 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $adminPassword = env('ADMIN_PASSWORD', 'admin123');
+        // Fetch admin password from DB or fallback to env/default
+        $adminPassword = \App\Models\Setting::get('admin_password');
+        if (!$adminPassword) {
+            $adminPassword = env('ADMIN_PASSWORD', 'admin123');
+        }
 
-        if ($request->password === $adminPassword) {
-            session(['admin_logged_in' => true]);
+        // Check if the stored password is bcrypt hashed
+        $isMatch = false;
+        if (str_starts_with($adminPassword, '$2y$') || str_starts_with($adminPassword, '$2a$')) {
+            $isMatch = \Illuminate\Support\Facades\Hash::check($request->password, $adminPassword);
+        } else {
+            $isMatch = ($request->password === $adminPassword);
+        }
+
+        if ($isMatch) {
+            $company = view()->shared('currentCompany');
+            $companyCode = $company ? $company->code : 'default';
+            session(['admin_logged_in_' . $companyCode => true]);
             return redirect()->route('admin.dashboard');
         }
 
-        return back()->withErrors(['password' => 'Invalid password! Default is admin123.']);
+        return back()->withErrors(['password' => 'Invalid password!']);
     }
 
     /**
@@ -42,7 +59,9 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        session()->forget('admin_logged_in');
-        return redirect()->route('admin.login');
+        $company = view()->shared('currentCompany');
+        $companyCode = $company ? $company->code : 'default';
+        session()->forget('admin_logged_in_' . $companyCode);
+        return redirect()->route('admin.login', ['company' => $companyCode]);
     }
 }

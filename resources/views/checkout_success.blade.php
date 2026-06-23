@@ -107,9 +107,31 @@
                     <span class="line-through">₹{{ number_format($order->subtotal, 2) }}</span>
                 </div>
                 <div class="flex justify-between text-crimson-600">
-                    <span>Flat {{ App\Models\Setting::get('discount_percent', 60) }}% Discount Savings:</span>
+                    <span>Discount Savings:</span>
                     <span class="font-black">-₹{{ number_format($order->discount_amount, 2) }}</span>
                 </div>
+                
+                @if(App\Models\Setting::get('enable_tax_delivery', 'no') === 'yes')
+                    @php
+                        $itemsNet = max(0, $order->subtotal - $order->discount_amount);
+                        $taxPercent = (float) App\Models\Setting::get('tax_percent', 18);
+                        $taxVal = $itemsNet * ($taxPercent / 100);
+                        $deliveryVal = (float) App\Models\Setting::get('delivery_charge', 150);
+                    @endphp
+                    <div class="flex justify-between text-slate-500 border-t border-slate-200 pt-2.5">
+                        <span>Items Net Value:</span>
+                        <span>₹{{ number_format($itemsNet, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between text-slate-500">
+                        <span>GST / Tax ({{ $taxPercent }}%):</span>
+                        <span>₹{{ number_format($taxVal, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between text-slate-500">
+                        <span>Delivery Charge:</span>
+                        <span>₹{{ number_format($deliveryVal, 2) }}</span>
+                    </div>
+                @endif
+                
                 <div class="flex justify-between text-slate-800 border-t border-slate-200 pt-2.5 text-sm font-black">
                     <span>Net Amount Payable:</span>
                     <span class="text-crimson-650 text-base font-black">₹{{ number_format($order->net_amount, 2) }}</span>

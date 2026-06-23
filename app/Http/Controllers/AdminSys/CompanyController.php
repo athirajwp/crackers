@@ -34,12 +34,14 @@ class CompanyController extends Controller
             'code' => 'required|string|max:255|unique:companies,code',
             'name' => 'required|string|max:255',
             'website' => 'required|string|max:255',
+            'contact_1' => 'required|string|max:255',
             'status' => 'required|in:active,inactive',
         ]);
 
         $data = $request->all();
 
         // Handle standard dynamic file uploads
+        $companyCode = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $request->code));
         $files = ['bank_qr_1', 'bank_qr_2', 'bank_qr_3', 'logo_path', 'favicon_path'];
         foreach ($files as $file) {
             if ($request->hasFile($file)) {
@@ -48,15 +50,69 @@ class CompanyController extends Controller
                 ]);
                 
                 $fileName = time() . '_' . $file . '_' . uniqid() . '.' . $request->file($file)->extension();
-                $request->file($file)->move(public_path('uploads/sys_companies'), $fileName);
-                $data[$file] = 'uploads/sys_companies/' . $fileName;
+                $request->file($file)->move(public_path("uploads/companies/{$companyCode}/profile"), $fileName);
+                $data[$file] = "uploads/companies/{$companyCode}/profile/" . $fileName;
             }
         }
 
-        Company::create($data);
+        // Create the company record in central DB first
+        $company = Company::create($data);
 
-        return redirect()->route('admin_sys.company.index')->with('success', 'New domain company registered successfully!');
+        // Dynamically create, migrate, and seed the new database
+        try {
+            $tenantDb = 'crackers_' . strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $company->code));
+            
+            // Check and create database
+            $exists = DB::connection('central')->select("SELECT 1 FROM pg_database WHERE datname = ?", [$tenantDb]);
+            if (empty($exists)) {
+                DB::connection('central')->statement("CREATE DATABASE $tenantDb");
+            }
+
+            // Configure temporary connection configuration for migrating
+            $config = config("database.connections.central");
+            $config['database'] = $tenantDb;
+            config(["database.connections.tenant_migration" => $config]);
+
+            // Clear database connection cache for safety
+            DB::purge('tenant_migration');
+
+            // Run migrations programmatically
+            \Illuminate\Support\Facades\Artisan::call('migrate', [
+                '--database' => 'tenant_migration',
+                '--force' => true,
+            ]);
+
+            // Run seeders programmatically
+            \Illuminate\Support\Facades\Artisan::call('db:seed', [
+                '--database' => 'tenant_migration',
+                '--class' => 'Database\\Seeders\\CategoryAndProductSeeder',
+                '--force' => true,
+            ]);
+            
+        } catch (\Exception $e) {
+            // Delete the company record if DB setup failed
+            $company->delete();
+            
+            // Attempt to clean up database if it was created
+            try {
+                if (isset($tenantDb)) {
+                    DB::connection('central')->statement("DROP DATABASE IF EXISTS $tenantDb");
+                }
+            } catch (\Exception $dbDropEx) {
+                // Ignore drop error
+            }
+            
+            // Log the error
+            \Illuminate\Support\Facades\Log::error('Tenant database setup failed: ' . $e->getMessage());
+            
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['code' => 'Database setup failed: ' . $e->getMessage()]);
+        }
+
+        return redirect()->route('admin_sys.company.index')->with('success', 'New domain company registered and database created successfully!');
     }
+
 
     /**
      * Update an existing company domain record.
@@ -71,12 +127,14 @@ class CompanyController extends Controller
             'code' => 'required|string|max:255|unique:companies,code,' . $id,
             'name' => 'required|string|max:255',
             'website' => 'required|string|max:255',
+            'contact_1' => 'required|string|max:255',
             'status' => 'required|in:active,inactive',
         ]);
 
         $data = $request->all();
 
         // Handle standard dynamic file uploads
+        $companyCode = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $request->code));
         $files = ['bank_qr_1', 'bank_qr_2', 'bank_qr_3', 'logo_path', 'favicon_path'];
         foreach ($files as $file) {
             if ($request->hasFile($file)) {
@@ -91,12 +149,202 @@ class CompanyController extends Controller
                 }
                 
                 $fileName = time() . '_' . $file . '_' . uniqid() . '.' . $request->file($file)->extension();
-                $request->file($file)->move(public_path('uploads/sys_companies'), $fileName);
-                $data[$file] = 'uploads/sys_companies/' . $fileName;
+                $request->file($file)->move(public_path("uploads/companies/{$companyCode}/profile"), $fileName);
+                $data[$file] = "uploads/companies/{$companyCode}/profile/" . $fileName;
+            }
+        }
+
+        $oldCode = $company->code;
+        $newCode = $request->code;
+        $codeChanged = (strtolower($oldCode) !== strtolower($newCode));
+
+        if ($codeChanged) {
+            $oldDb = 'crackers_' . strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $oldCode));
+            $newDb = 'crackers_' . strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $newCode));
+
+            // Check if new database already exists
+            $newExists = DB::connection('central')->select("SELECT 1 FROM pg_database WHERE datname = ?", [$newDb]);
+            if (!empty($newExists)) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['code' => "Database $newDb already exists. Cannot rename to this code."]);
+            }
+
+            // Terminate active connections to old database so we can rename it
+            try {
+                DB::connection('central')->statement("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = ?", [$oldDb]);
+            } catch (\Exception $e) {
+                // Ignore connection termination errors
+            }
+
+            // Rename database
+            try {
+                $oldExists = DB::connection('central')->select("SELECT 1 FROM pg_database WHERE datname = ?", [$oldDb]);
+                if (!empty($oldExists)) {
+                    DB::connection('central')->statement("ALTER DATABASE $oldDb RENAME TO $newDb");
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Failed to rename database from $oldDb to $newDb: " . $e->getMessage());
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['code' => "Failed to rename database: " . $e->getMessage()]);
+            }
+
+            // Also rename the upload folder if it exists
+            $cleanOldCode = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $oldCode));
+            $cleanNewCode = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $newCode));
+            $oldUploadDir = public_path("uploads/companies/{$cleanOldCode}");
+            $newUploadDir = public_path("uploads/companies/{$cleanNewCode}");
+            if (is_dir($oldUploadDir)) {
+                $parentDir = dirname($newUploadDir);
+                if (!is_dir($parentDir)) {
+                    @mkdir($parentDir, 0755, true);
+                }
+                @rename($oldUploadDir, $newUploadDir);
+                
+                // Update paths in $data for existing files to match the new folder name
+                foreach (['bank_qr_1', 'bank_qr_2', 'bank_qr_3', 'logo_path', 'favicon_path'] as $file) {
+                    if ($company->{$file} && str_contains($company->{$file}, "uploads/companies/{$cleanOldCode}/")) {
+                        $data[$file] = str_replace(
+                            "uploads/companies/{$cleanOldCode}/",
+                            "uploads/companies/{$cleanNewCode}/",
+                            $company->{$file}
+                        );
+                    }
+                }
+            }
+
+            // Update file paths inside the tenant's database tables
+            try {
+                // Configure dynamic database connection configuration for the update
+                $config = config("database.connections.central");
+                $config['database'] = $newDb;
+                config(["database.connections.tenant_path_update" => $config]);
+                
+                // Clear DB connection cache
+                DB::purge('tenant_path_update');
+                
+                $oldPathPart = "uploads/companies/{$cleanOldCode}/";
+                $newPathPart = "uploads/companies/{$cleanNewCode}/";
+                
+                // 1. Update settings table
+                DB::connection('tenant_path_update')
+                    ->table('settings')
+                    ->where('value', 'LIKE', "%{$oldPathPart}%")
+                    ->get()
+                    ->each(function ($setting) use ($oldPathPart, $newPathPart) {
+                        $newValue = str_replace($oldPathPart, $newPathPart, $setting->value);
+                        DB::connection('tenant_path_update')
+                            ->table('settings')
+                            ->where('key', $setting->key)
+                            ->update(['value' => $newValue]);
+                    });
+                
+                // 2. Update products table
+                DB::connection('tenant_path_update')
+                    ->table('products')
+                    ->where('image', 'LIKE', "%{$oldPathPart}%")
+                    ->get()
+                    ->each(function ($product) use ($oldPathPart, $newPathPart) {
+                        $newImage = str_replace($oldPathPart, $newPathPart, $product->image);
+                        DB::connection('tenant_path_update')
+                            ->table('products')
+                            ->where('id', $product->id)
+                            ->update(['image' => $newImage]);
+                    });
+                
+                DB::purge('tenant_path_update');
+            } catch (\Exception $pathEx) {
+                \Illuminate\Support\Facades\Log::error("Failed to update tenant file paths after code change: " . $pathEx->getMessage());
             }
         }
 
         $company->update($data);
+
+        // Synchronize updated company settings to the tenant's local settings database table
+        try {
+            $tenantDb = 'crackers_' . strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $company->code));
+            
+            // Check if tenant database exists in PostgreSQL
+            $exists = DB::connection('central')->select("SELECT 1 FROM pg_database WHERE datname = ?", [$tenantDb]);
+            if (!empty($exists)) {
+                // Configure dynamic database connection configuration for the update
+                $config = config("database.connections.central");
+                $config['database'] = $tenantDb;
+                config(["database.connections.tenant_update" => $config]);
+                
+                // Clear DB connection cache
+                DB::purge('tenant_update');
+                
+                $settings = [
+                    'store_name' => ['value' => $company->name, 'type' => 'text'],
+                    'min_order_value' => ['value' => $company->min_purchase ?: '3800', 'type' => 'number'],
+                    'store_phone' => ['value' => $company->contact_1 ?: '+91 9998887776', 'type' => 'text'],
+                    'store_email' => ['value' => $company->email_1 ?: 'crackerdemo@gmail.com', 'type' => 'text'],
+                    'store_address' => ['value' => $company->address_1 ?: 'Virudhunagar to Sivakasi Main Road, Sivakasi', 'type' => 'textarea'],
+                ];
+                
+                $wa = $company->wa_link ?: $company->contact_1;
+                if ($wa) {
+                    $cleanWa = preg_replace('/[^0-9]/', '', $wa);
+                    if (!empty($cleanWa)) {
+                        $settings['store_whatsapp'] = ['value' => $cleanWa, 'type' => 'text'];
+                    }
+                }
+                
+                $settings['store_upi'] = ['value' => $company->bank_acc_1 ? ($company->bank_acc_1 . '@okaxis') : 'aathishacrackers@okaxis', 'type' => 'text'];
+                $settings['bank_name'] = ['value' => $company->bank_name_1 ?: 'State Bank of India', 'type' => 'text'];
+                $settings['bank_acc_no'] = ['value' => $company->bank_acc_1 ?: '1234567890', 'type' => 'text'];
+                $settings['bank_ifsc'] = ['value' => $company->bank_ifsc_1 ?: 'SBIN0000123', 'type' => 'text'];
+                $settings['bank_holder'] = ['value' => $company->bank_holder_1 ?: $company->name, 'type' => 'text'];
+                
+                for ($i = 1; $i <= 5; $i++) {
+                    $codeField = "promo_code_{$i}";
+                    $valField = "promo_value_{$i}";
+                    if (!empty($company->{$codeField})) {
+                        $settings[$codeField] = ['value' => $company->{$codeField}, 'type' => 'text'];
+                    } else {
+                        $settings[$codeField] = ['value' => '', 'type' => 'text'];
+                    }
+                    if (!empty($company->{$valField})) {
+                        $settings[$valField] = ['value' => $company->{$valField}, 'type' => 'text'];
+                    } else {
+                        $settings[$valField] = ['value' => '', 'type' => 'text'];
+                    }
+                }
+                
+                $socialMap = [
+                    'facebook_link' => 'fb_link',
+                    'twitter_link' => 'tw_link',
+                    'youtube_link' => 'yt_link',
+                    'whatsapp_link' => 'wa_link',
+                    'instagram_link' => 'ig_link',
+                ];
+                foreach ($socialMap as $settingKey => $compField) {
+                    $settings[$settingKey] = ['value' => $company->{$compField} ?: '', 'type' => 'text'];
+                }
+                
+                if (!empty($company->theme)) {
+                    $settings['admin_theme'] = ['value' => $company->theme === 'Theme_1' ? 'gold' : ($company->theme === 'Theme_2' ? 'blue' : ($company->theme === 'Theme_3' ? 'emerald' : 'gold')), 'type' => 'text'];
+                }
+                if (!empty($company->tagline)) {
+                    $settings['banner_scroller'] = ['value' => $company->tagline, 'type' => 'text'];
+                }
+                
+                foreach ($settings as $key => $sData) {
+                    DB::connection('tenant_update')
+                        ->table('settings')
+                        ->updateOrInsert(
+                            ['key' => $key],
+                            ['value' => $sData['value'], 'type' => $sData['type']]
+                        );
+                }
+                
+                DB::purge('tenant_update');
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Failed to sync updated details to tenant database settings: " . $e->getMessage());
+        }
 
         return redirect()->route('admin_sys.company.index')->with('success', 'Domain company details updated successfully!');
     }
@@ -106,9 +354,17 @@ class CompanyController extends Controller
      */
     public function destroy($id)
     {
+        \Illuminate\Support\Facades\Log::info("CompanyController@destroy started for ID $id");
         $company = Company::findOrFail($id);
+
+        // Guard: Prevent deleting the last remaining company profile
+        if (Company::count() <= 1) {
+            \Illuminate\Support\Facades\Log::warning("Prevented deletion of company profile {$company->code} because it is the last remaining company.");
+            return redirect()->route('admin_sys.company.index')->with('error', 'The last remaining company profile cannot be deleted.');
+        }
         
-        // Delete uploaded files
+        // 1. Delete uploaded files
+        \Illuminate\Support\Facades\Log::info("Deleting uploaded files for company {$company->code}");
         $files = ['bank_qr_1', 'bank_qr_2', 'bank_qr_3', 'logo_path', 'favicon_path'];
         foreach ($files as $file) {
             $path = $company->{$file};
@@ -117,9 +373,45 @@ class CompanyController extends Controller
             }
         }
 
-        $company->delete();
+        // 2. Drop the tenant database from PostgreSQL
+        $tenantDb = 'crackers_' . strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $company->code));
+        \Illuminate\Support\Facades\Log::info("Dropping database $tenantDb for company {$company->code}");
+        try {
+            // First terminate active connections to the database
+            \Illuminate\Support\Facades\Log::info("Terminating active connections for $tenantDb");
+            DB::connection('central')->statement("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = ?", [$tenantDb]);
+            
+            // Drop database forcing connection termination
+            \Illuminate\Support\Facades\Log::info("Executing DROP DATABASE statement for $tenantDb");
+            DB::connection('central')->statement("DROP DATABASE IF EXISTS $tenantDb WITH (FORCE)");
+            \Illuminate\Support\Facades\Log::info("Database $tenantDb dropped successfully or skipped if not exists");
+            
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning("Failed to drop database for company {$company->code}: " . $e->getMessage());
+        }
 
-        return redirect()->route('admin_sys.company.index')->with('success', 'Domain company profile deleted successfully!');
+        // 3. Delete the company record from central DB
+        \Illuminate\Support\Facades\Log::info("Deleting company record {$company->code} from central companies table");
+        $company->delete();
+        \Illuminate\Support\Facades\Log::info("Company record {$company->code} deleted successfully");
+
+        return redirect()->route('admin_sys.company.index')->with('success', 'Domain company profile and database deleted successfully!');
+    }
+
+    /**
+     * Toggle the status of the specified company.
+     */
+    public function toggleStatus($id)
+    {
+        $company = Company::findOrFail($id);
+        $company->status = ($company->status === 'active') ? 'inactive' : 'active';
+        $company->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => $company->status,
+            'message' => "Company '{$company->name}' status is now {$company->status}!"
+        ]);
     }
 
     /**
@@ -127,25 +419,27 @@ class CompanyController extends Controller
      */
     private function ensureTableExists()
     {
-        // Self-healing drop logic if table lacks the new "code" column or needs seeded SMTP fields updated
-        $needsSeedingUpdate = false;
-        if (Schema::hasTable('companies')) {
-            if (Schema::hasColumn('companies', 'code') && Schema::hasColumn('companies', 'smtp_host')) {
-                $test = Company::where('code', 'mahesh')->first();
-                if ($test && empty($test->smtp_host)) {
-                    $needsSeedingUpdate = true;
+        // 1. Check if table exists and has all required columns. If not, drop and recreate.
+        $hasTable = Schema::connection('central')->hasTable('companies');
+        $needsRecreate = false;
+        
+        if ($hasTable) {
+            $requiredColumns = ['code', 'smtp_host', 'tagline', 'logo_icon', 'logo_path', 'favicon_path'];
+            foreach ($requiredColumns as $col) {
+                if (!Schema::connection('central')->hasColumn('companies', $col)) {
+                    $needsRecreate = true;
+                    break;
                 }
-            } else {
-                $needsSeedingUpdate = true;
             }
         }
 
-        if (Schema::hasTable('companies') && (!Schema::hasColumn('companies', 'code') || $needsSeedingUpdate)) {
-            Schema::dropIfExists('companies');
+        if ($hasTable && $needsRecreate) {
+            Schema::connection('central')->dropIfExists('companies');
+            $hasTable = false;
         }
 
-        if (!Schema::hasTable('companies')) {
-            Schema::create('companies', function ($table) {
+        if (!$hasTable) {
+            Schema::connection('central')->create('companies', function ($table) {
                 $table->id();
                 
                 // Main Info
@@ -158,6 +452,7 @@ class CompanyController extends Controller
                 $table->string('theme')->nullable();
                 $table->string('type')->nullable();
                 $table->string('status')->default('active');
+                $table->string('tagline')->nullable();
                 
                 // Contacts
                 $table->string('contact_1')->nullable();
@@ -240,9 +535,22 @@ class CompanyController extends Controller
                 $table->string('copyright_text')->nullable();
                 $table->string('logo_path')->nullable();
                 $table->string('favicon_path')->nullable();
+                $table->string('logo_icon')->nullable();
 
                 $table->timestamps();
             });
+        }
+
+        // 2. Ensure default seeded companies exist only if the table is completely empty
+        if (Company::count() === 0) {
+            Company::create([
+                'code' => 'crackersdemo',
+                'name' => 'Crackers Demo',
+                'website' => 'crackersdemo.com',
+                'status' => 'active',
+                'tagline' => 'Fresh and Warm Bakes Everyday',
+                'logo_icon' => 'fa-solid fa-fire-burner',
+            ]);
 
             Company::create([
                 'code' => 'mahesh',
@@ -251,6 +559,8 @@ class CompanyController extends Controller
                 'status' => 'active',
                 'contact_1' => '9442189007',
                 'email_1' => 'mbcakes@gmail.com',
+                'tagline' => 'Freshly Baked Goodness',
+                'logo_icon' => 'fa-solid fa-fire-burner',
             ]);
 
             Company::create([
@@ -260,6 +570,8 @@ class CompanyController extends Controller
                 'status' => 'active',
                 'contact_1' => '8531856635',
                 'email_1' => 'sriachammalpyrotech@gmail.com',
+                'tagline' => 'Sivakasi Online Booking',
+                'logo_icon' => 'fa-solid fa-fire-burner',
             ]);
         }
 

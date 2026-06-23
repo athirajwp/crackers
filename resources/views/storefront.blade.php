@@ -102,7 +102,7 @@
 
     <!-- 1b. Welcome & Quick Order CTA Section -->
     <section class="container mx-auto px-4 py-8 select-none z-10 relative">
-        <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-sm text-center max-w-4xl mx-auto space-y-6">
+        <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-sm text-center w-full space-y-6">
             <span class="inline-flex items-center gap-1.5 bg-crimson-50 border border-crimson-100 text-crimson-700 text-[10px] font-extrabold uppercase tracking-widest px-3.5 py-1 rounded-full shadow-sm animate-pulse">
                 <i class="fa-solid fa-gift"></i> Sivakasi Wholesale Booking Open
             </span>
@@ -143,7 +143,7 @@
     </section>
 
     <!-- 2. Store Content Grid -->
-    <section class="container mx-auto px-4 py-10 flex flex-col lg:flex-row gap-8 items-start">
+    <section id="quick-order" class="container mx-auto px-4 py-10 flex flex-col lg:flex-row gap-8 items-start">
         
         <!-- Left: Category sidebar filters (Hidden on Mobile, Sticky on Desktop) -->
         <aside class="hidden lg:block lg:w-64 flex-shrink-0 lg:sticky lg:top-24 space-y-4 select-none">
@@ -341,7 +341,7 @@
             <div class="flex flex-col sm:flex-row gap-2.5 w-full lg:w-auto items-center justify-center lg:justify-end">
                 
                 <!-- Minimum Order Value Progress bar -->
-                <div class="w-full sm:w-44 text-center space-y-1" x-show="totalNet < {{ $settings['min_order_value'] }}">
+                <div class="w-full sm:w-44 text-center space-y-1" x-show="enableMinOrder && totalNet < {{ $settings['min_order_value'] }}">
                     <div class="flex justify-between text-[9px] text-slate-500 font-bold uppercase px-0.5">
                         <span>Min Order check</span>
                         <span class="text-crimson-650" x-text="minOrderProgressText()">Need ₹0 more</span>
@@ -358,7 +358,7 @@
                 </button>
 
                 <!-- Standard Action Button -->
-                <button @click="openCheckoutDrawer()" :disabled="totalNet < {{ $settings['min_order_value'] }}" :class="totalNet >= {{ $settings['min_order_value'] }} ? 'bg-gradient-to-r from-crimson-600 to-crimson-500 hover:from-crimson-700 hover:to-crimson-600 text-white shadow-md shadow-crimson-100 hover:scale-105 animate-bounce-subtle' : 'bg-slate-200 border border-slate-350 text-slate-400 cursor-not-allowed'" class="w-full sm:w-auto px-5 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2">
+                <button @click="openCheckoutDrawer()" :disabled="enableMinOrder && totalNet < {{ $settings['min_order_value'] }}" :class="(!enableMinOrder || totalNet >= {{ $settings['min_order_value'] }}) ? 'bg-gradient-to-r from-crimson-600 to-crimson-500 hover:from-crimson-700 hover:to-crimson-600 text-white shadow-md shadow-crimson-100 hover:scale-105 animate-bounce-subtle' : 'bg-slate-200 border border-slate-350 text-slate-400 cursor-not-allowed'" class="w-full sm:w-auto px-5 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-basket-shopping-simple"></i>
                     <span>Checkout Now</span>
                 </button>
@@ -449,11 +449,21 @@
                                     <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1.5"><i class="fa-solid fa-map-location mr-1 text-crimson-500/80"></i>Pin Code <span class="text-crimson-500">*</span></label>
                                     <input x-model="form.pincode" type="text" required placeholder="Pin Code" class="w-full bg-slate-50 border border-slate-200 focus:border-slate-350 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-700 placeholder-slate-400 focus:outline-none transition-all font-mono">
                                 </div>
-                            </div>
-
-                            <div>
+                                      <div>
                                 <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1.5"><i class="fa-solid fa-truck-ramp-box mr-1 text-crimson-500/80"></i>Preferred Lorry Transport Name</label>
                                 <input x-model="form.transport_name" type="text" placeholder="Preferred Transport Name (Optional)" class="w-full bg-slate-50 border border-slate-200 focus:border-slate-350 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-700 placeholder-slate-400 focus:outline-none transition-all">
+                            </div>
+
+                            <!-- Promo Code Input (Visible if enablePromoCodes is true) -->
+                            <div x-show="enablePromoCodes" class="space-y-1.5">
+                                <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1"><i class="fa-solid fa-ticket mr-1 text-crimson-500/80"></i>Promo / Coupon Code</label>
+                                <div class="flex gap-2">
+                                    <input x-model="form.promo_code" type="text" placeholder="Enter Promo Code" class="w-full bg-slate-50 border border-slate-200 focus:border-slate-350 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none transition-all uppercase font-mono">
+                                    <button type="button" @click="applyPromoCode()" class="bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap">
+                                        Apply
+                                    </button>
+                                </div>
+                                <span x-show="promoAppliedMessage" class="text-[10px] block mt-1 font-bold" :class="promoAppliedSuccess ? 'text-emerald-600' : 'text-crimson-600'" x-text="promoAppliedMessage"></span>
                             </div>
 
                             <div>
@@ -465,21 +475,46 @@
 
                         <!-- Drawer Footer -->
                         <div class="pt-4 border-t border-slate-250 space-y-4">
-                            <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-center justify-between text-xs font-semibold">
+                            <!-- Tax/Delivery & Promo Breakdown (only visible if enableTaxDelivery or a promo code is applied) -->
+                            <div x-show="enableTaxDelivery || (enablePromoCodes && appliedPromoCode)" class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl space-y-2 text-xs font-semibold">
+                                <div class="flex justify-between text-slate-500">
+                                    <span>Items Net Value:</span>
+                                    <span>₹<span x-text="formatCurrency(totalNet)">0.00</span></span>
+                                </div>
+                                <div x-show="enablePromoCodes && appliedPromoCode" class="flex justify-between text-emerald-600 font-bold">
+                                    <span>Promo Code Discount:</span>
+                                    <span>-₹<span x-text="formatCurrency(promoDiscountAmount)">0.00</span></span>
+                                </div>
+                                <div x-show="enableTaxDelivery" class="flex justify-between text-slate-500">
+                                    <span x-text="`GST / Tax (${taxPercent}%):`">GST:</span>
+                                    <span>₹<span x-text="formatCurrency(taxAmount)">0.00</span></span>
+                                </div>
+                                <div x-show="enableTaxDelivery" class="flex justify-between text-slate-500">
+                                    <span>Delivery Charge:</span>
+                                    <span>₹<span x-text="formatCurrency(deliveryCharge)">0.00</span></span>
+                                </div>
+                                <div class="flex justify-between text-slate-800 border-t border-slate-200 pt-2 font-black">
+                                    <span>Final Payable Total:</span>
+                                    <span class="text-crimson-655 text-sm font-black">₹<span x-text="formatCurrency(finalPayableAmount)">0.00</span></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Simple total if enableTaxDelivery and promo code is not applied -->
+                            <div x-show="!enableTaxDelivery && !(enablePromoCodes && appliedPromoCode)" class="bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-center justify-between text-xs font-semibold">
                                 <span class="text-slate-500">Total Net Booking Amount:</span>
                                 <span class="text-crimson-650 font-extrabold text-sm">₹<span x-text="formatCurrency(totalNet)">0.00</span></span>
                             </div>
 
                             <button type="submit" :disabled="submitting" class="w-full bg-gradient-to-r from-crimson-600 to-crimson-500 hover:from-crimson-700 hover:to-crimson-600 disabled:from-slate-200 disabled:to-slate-200 text-white disabled:text-slate-400 font-extrabold py-3.5 rounded-full text-xs uppercase tracking-wider shadow transform active:scale-95 transition-all flex items-center justify-center gap-2">
                                 <template x-if="submitting">
-                                    <i class="fa-solid fa-spinner-third animate-spin mr-1"></i>
+                                    <i class="fa-solid fa-spinner animate-spin mr-1"></i>
                                 </template>
                                 <template x-if="!submitting">
                                     <i class="fa-solid fa-file-invoice-dollar mr-1"></i>
                                 </template>
                                 <span x-text="submitting ? 'Placing Order...' : 'Submit & Get UPI Invoice'">Submit & Get UPI Invoice</span>
                             </button>
-                        </div>
+                        </div>                        </div>
 
                     </form>
 
@@ -505,6 +540,30 @@
             totalNet: 0.00,
             totalUniqueProducts: 0,
             
+            // Feature flags config
+            enableMinOrder: '{{ $settings['enable_min_order'] ?? 'yes' }}' === 'yes',
+            enablePromoCodes: '{{ $settings['enable_promo_codes'] ?? 'yes' }}' === 'yes',
+            enableTaxDelivery: '{{ $settings['enable_tax_delivery'] ?? 'no' }}' === 'yes',
+            taxPercent: parseFloat('{{ $settings['tax_percent'] ?? 18 }}'),
+            deliveryCharge: parseFloat('{{ $settings['delivery_charge'] ?? 150 }}'),
+            
+            promoCodes: [
+                { code: '{{ $settings['promo_code_1'] ?? '' }}', value: '{{ $settings['promo_value_1'] ?? '' }}' },
+                { code: '{{ $settings['promo_code_2'] ?? '' }}', value: '{{ $settings['promo_value_2'] ?? '' }}' },
+                { code: '{{ $settings['promo_code_3'] ?? '' }}', value: '{{ $settings['promo_value_3'] ?? '' }}' },
+                { code: '{{ $settings['promo_code_4'] ?? '' }}', value: '{{ $settings['promo_value_4'] ?? '' }}' },
+                { code: '{{ $settings['promo_code_5'] ?? '' }}', value: '{{ $settings['promo_value_5'] ?? '' }}' },
+            ],
+
+            promoCodeInput: '',
+            appliedPromoCode: '',
+            promoDiscountAmount: 0.00,
+            promoAppliedMessage: '',
+            promoAppliedSuccess: false,
+            
+            taxAmount: 0.00,
+            finalPayableAmount: 0.00,
+            
             checkoutOpen: false,
             submitting: false,
             
@@ -519,7 +578,8 @@
                 state: 'Tamilnadu',
                 pincode: '',
                 transport_name: '',
-                notes: ''
+                notes: '',
+                promo_code: ''
             },
 
             initStorefront() {
@@ -618,6 +678,47 @@
                 });
             },
 
+            applyPromoCode() {
+                const code = this.form.promo_code.trim().toUpperCase();
+                if (!code) {
+                    this.appliedPromoCode = '';
+                    this.promoDiscountAmount = 0.00;
+                    this.promoAppliedMessage = '';
+                    this.promoAppliedSuccess = false;
+                    this.calculateCart();
+                    return;
+                }
+
+                // Check promo codes array
+                const match = this.promoCodes.find(p => p.code && p.code.toUpperCase() === code);
+                if (match && match.code) {
+                    this.appliedPromoCode = match.code;
+                    this.promoAppliedSuccess = true;
+                    
+                    // Calculate discount
+                    const val = match.value.trim();
+                    let discount = 0;
+                    if (val.includes('%')) {
+                        const pct = parseFloat(val.replace('%', ''));
+                        if (pct > 0) {
+                            discount = (this.totalNet * pct) / 100;
+                        }
+                    } else {
+                        discount = parseFloat(val);
+                    }
+                    
+                    this.promoDiscountAmount = Math.min(discount, this.totalNet);
+                    this.promoAppliedMessage = `Code applied! You saved ₹${this.promoDiscountAmount.toFixed(2)}`;
+                    this.calculateCart();
+                } else {
+                    this.appliedPromoCode = '';
+                    this.promoDiscountAmount = 0.00;
+                    this.promoAppliedMessage = 'Invalid promo code.';
+                    this.promoAppliedSuccess = false;
+                    this.calculateCart();
+                }
+            },
+
             calculateCart() {
                 let qtySum = 0;
                 let mrpSum = 0;
@@ -639,6 +740,36 @@
                 this.totalNet = netSum;
                 this.totalDiscount = mrpSum - netSum;
                 this.totalUniqueProducts = uniques;
+
+                // Dynamic calculations for features
+                if (this.enablePromoCodes && this.appliedPromoCode) {
+                    const match = this.promoCodes.find(p => p.code && p.code.toUpperCase() === this.appliedPromoCode.toUpperCase());
+                    if (match) {
+                        const val = match.value.trim();
+                        let discount = 0;
+                        if (val.includes('%')) {
+                            const pct = parseFloat(val.replace('%', ''));
+                            discount = (this.totalNet * pct) / 100;
+                        } else {
+                            discount = parseFloat(val);
+                        }
+                        this.promoDiscountAmount = Math.min(discount, this.totalNet);
+                    }
+                } else {
+                    this.promoDiscountAmount = 0.00;
+                }
+
+                const postPromoNet = Math.max(0, this.totalNet - this.promoDiscountAmount);
+
+                if (this.enableTaxDelivery) {
+                    this.taxAmount = postPromoNet * (this.taxPercent / 100);
+                    this.deliveryCharge = this.totalQty > 0 ? this.deliveryCharge : 0.00;
+                    this.finalPayableAmount = postPromoNet + this.taxAmount + this.deliveryCharge;
+                } else {
+                    this.taxAmount = 0.00;
+                    this.deliveryCharge = 0.00;
+                    this.finalPayableAmount = postPromoNet;
+                }
             },
 
             minOrderProgressPercent() {
@@ -701,7 +832,7 @@
             },
 
             openCheckoutDrawer() {
-                if (this.totalNet >= {{ $settings['min_order_value'] }}) {
+                if (!this.enableMinOrder || this.totalNet >= {{ $settings['min_order_value'] }}) {
                     this.checkoutOpen = true;
                 }
             },
@@ -723,6 +854,7 @@
 
                 const payload = {
                     ...this.form,
+                    promo_code: this.appliedPromoCode,
                     items: orderItems
                 };
 

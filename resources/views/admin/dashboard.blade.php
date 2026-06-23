@@ -149,17 +149,26 @@
                 </a>
             </div>
 
-            <!-- Database health indicators -->
+            <!-- Database connection details -->
+            @php
+                $dbConnection = config('database.default');
+                $dbDatabase = \Illuminate\Support\Facades\DB::connection()->getDatabaseName();
+                $dbHost = config("database.connections.{$dbConnection}.host", '127.0.0.1');
+            @endphp
             <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2 font-semibold">
-                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block"><i class="fa-solid fa-database mr-1"></i> SQLite Database Health</span>
+                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block"><i class="fa-solid fa-database mr-1"></i> Database Status</span>
                 <div class="text-[10px] text-slate-500 space-y-1.5">
                     <div class="flex justify-between">
-                        <span>Database Size:</span>
-                        <strong class="text-slate-700 font-mono">{{ number_format(filesize(database_path('database.sqlite')) / 1024, 2) }} KB</strong>
+                        <span>Engine:</span>
+                        <strong class="text-slate-700 font-mono uppercase">{{ $dbConnection }}</strong>
                     </div>
                     <div class="flex justify-between">
-                        <span>Database File:</span>
-                        <strong class="text-slate-500 font-mono text-[9px] truncate w-32 text-right">database.sqlite</strong>
+                        <span>Database:</span>
+                        <strong class="text-slate-500 font-mono text-[9px] truncate w-32 text-right" title="{{ $dbDatabase }}">{{ $dbDatabase }}</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Host:</span>
+                        <strong class="text-slate-500 font-mono text-[9px] truncate w-32 text-right" title="{{ $dbHost }}">{{ $dbHost }}</strong>
                     </div>
                 </div>
             </div>

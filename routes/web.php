@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\BrandingController;
+use App\Http\Controllers\Admin\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,6 +33,9 @@ Route::get('/track', [OrderTrackingController::class, 'index'])->name('track.ind
 Route::post('/track', [OrderTrackingController::class, 'search'])->name('track.search');
 
 // 3. Admin Authentication Entries
+Route::get('/admin', function (\Illuminate\Http\Request $request) {
+    return redirect()->route('admin.login', $request->query());
+});
 Route::get('/admin/login', [AuthController::class, 'showLogin'])->name('admin.login');
 Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.post');
 Route::post('/admin/logout', [AuthController::class, 'logout'])->name('admin.logout');
@@ -48,6 +52,10 @@ Route::middleware(['admin.auth'])->prefix('admin')->name('admin.')->group(functi
     // Site Branding customization parameters
     Route::get('/branding', [BrandingController::class, 'index'])->name('branding.index');
     Route::post('/branding', [BrandingController::class, 'update'])->name('branding.update');
+
+    // Admin Profile settings & Password Change
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
     // Category management CRUD
     Route::resource('categories', CategoryController::class)->except(['show', 'create']);
     
@@ -63,8 +71,21 @@ Route::middleware(['admin.auth'])->prefix('admin')->name('admin.')->group(functi
 
 // 4. Super Admin Multi-Domain Panel Routing Group
 Route::prefix('admin_sys')->name('admin_sys.')->group(function () {
-    Route::get('/company', [\App\Http\Controllers\AdminSys\CompanyController::class, 'index'])->name('company.index');
-    Route::post('/company', [\App\Http\Controllers\AdminSys\CompanyController::class, 'store'])->name('company.store');
-    Route::post('/company/{id}/update', [\App\Http\Controllers\AdminSys\CompanyController::class, 'update'])->name('company.update');
-    Route::delete('/company/{id}', [\App\Http\Controllers\AdminSys\CompanyController::class, 'destroy'])->name('company.destroy');
+    // Auth routes
+    Route::get('/login', [\App\Http\Controllers\AdminSys\AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [\App\Http\Controllers\AdminSys\AuthController::class, 'login'])->name('login.post');
+    Route::post('/logout', [\App\Http\Controllers\AdminSys\AuthController::class, 'logout'])->name('logout');
+
+    // Protected routes
+    Route::middleware(['super_admin.auth'])->group(function () {
+        Route::get('/company', [\App\Http\Controllers\AdminSys\CompanyController::class, 'index'])->name('company.index');
+        Route::post('/company', [\App\Http\Controllers\AdminSys\CompanyController::class, 'store'])->name('company.store');
+        Route::post('/company/{id}/update', [\App\Http\Controllers\AdminSys\CompanyController::class, 'update'])->name('company.update');
+        Route::post('/company/{id}/toggle-status', [\App\Http\Controllers\AdminSys\CompanyController::class, 'toggleStatus'])->name('company.toggle_status');
+        Route::delete('/company/{id}', [\App\Http\Controllers\AdminSys\CompanyController::class, 'destroy'])->name('company.destroy');
+
+        // Super Admin Profile Management
+        Route::get('/profile', [\App\Http\Controllers\AdminSys\ProfileController::class, 'edit'])->name('profile');
+        Route::post('/profile', [\App\Http\Controllers\AdminSys\ProfileController::class, 'update'])->name('profile.update');
+    });
 });

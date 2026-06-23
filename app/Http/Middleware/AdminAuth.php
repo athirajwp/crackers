@@ -15,8 +15,11 @@ class AdminAuth
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->session()->has('admin_logged_in')) {
-            return redirect()->route('admin.login');
+        $company = view()->shared('currentCompany');
+        $companyCode = $company ? $company->code : 'default';
+
+        if (!$request->session()->has('admin_logged_in_' . $companyCode)) {
+            return redirect()->route('admin.login', ['company' => $companyCode]);
         }
 
         return $next($request);

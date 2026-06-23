@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model
 {
+    protected $connection = 'central';
     protected $table = 'companies';
+
 
     protected $fillable = [
         // Main
-        'code', 'name', 'website', 'gst_number', 'pan_number', 'msme_number', 'theme', 'type', 'status',
+        'code', 'name', 'website', 'gst_number', 'pan_number', 'msme_number', 'theme', 'type', 'status', 'tagline',
         
         // Contacts
         'contact_1', 'contact_2', 'contact_3', 'contact_4', 'contact_5',
@@ -45,6 +47,6 @@ class Company extends Model
 
         // Website overview
         'fb_link', 'tw_link', 'yt_link', 'wa_link', 'ig_link', 'pin_link', 'copyright_text',
-        'logo_path', 'favicon_path'
+        'logo_path', 'favicon_path', 'logo_icon'
     ];
 }

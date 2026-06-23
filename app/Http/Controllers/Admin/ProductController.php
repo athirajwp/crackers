@@ -45,10 +45,14 @@ class ProductController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('image')) {
-            // For portability, we can store in public/uploads/products
+            $company = view()->shared('currentCompany');
+            $companyCode = $company ? $company->code : 'default';
+            $companyCodeClean = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $companyCode));
+            $uploadDir = "uploads/companies/{$companyCodeClean}/products";
+
             $imageName = time() . '_' . uniqid() . '.' . $request->image->extension();
-            $request->image->move(public_path('uploads/products'), $imageName);
-            $imagePath = 'uploads/products/' . $imageName;
+            $request->image->move(public_path($uploadDir), $imageName);
+            $imagePath = $uploadDir . '/' . $imageName;
         }
 
         Product::create([
@@ -95,9 +99,14 @@ class ProductController extends Controller
                 @unlink(public_path($product->image));
             }
 
+            $company = view()->shared('currentCompany');
+            $companyCode = $company ? $company->code : 'default';
+            $companyCodeClean = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $companyCode));
+            $uploadDir = "uploads/companies/{$companyCodeClean}/products";
+
             $imageName = time() . '_' . uniqid() . '.' . $request->image->extension();
-            $request->image->move(public_path('uploads/products'), $imageName);
-            $imagePath = 'uploads/products/' . $imageName;
+            $request->image->move(public_path($uploadDir), $imageName);
+            $imagePath = $uploadDir . '/' . $imageName;
         }
 
         $product->update([

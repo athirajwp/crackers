@@ -98,7 +98,15 @@
                                 <!-- Details -->
                                 <td class="py-3.5 px-4 border-r border-slate-150 space-y-1">
                                     <div class="text-slate-850 font-black" x-text="'Name : ' + company.name"></div>
-                                    <div class="text-[10px] text-slate-500" x-text="'Email : ' + (company.email_1 || '—')"></div>
+                                    <div class="text-[10px] text-slate-500">
+                                        Email : 
+                                        <template x-if="company.email_1">
+                                            <a :href="'mailto:' + company.email_1" class="text-blue-600 hover:underline" x-text="company.email_1"></a>
+                                        </template>
+                                        <template x-if="!company.email_1">
+                                            <span>—</span>
+                                        </template>
+                                    </div>
                                     <div class="text-[10px] text-slate-500 font-mono" x-text="'Mobile Number : ' + (company.contact_1 || '—')"></div>
                                 </td>
                                 
@@ -122,10 +130,13 @@
                                 <!-- Actions -->
                                 <td class="py-3.5 px-4 text-center space-y-2 select-none">
                                     <!-- Status Pill -->
-                                    <span :class="company.status === 'active' ? 'bg-emerald-600 shadow-sm shadow-emerald-500/20' : 'bg-slate-400'" class="inline-block text-[8px] uppercase tracking-wider text-white font-extrabold px-2 py-0.5 rounded-md" x-text="company.status"></span>
+                                    <button @click="toggleStatus(company)" :class="company.status === 'active' ? 'bg-emerald-600 shadow-sm shadow-emerald-500/20 hover:bg-emerald-700' : 'bg-slate-400 hover:bg-slate-500'" class="inline-block text-[8px] uppercase tracking-wider text-white font-extrabold px-2.5 py-1 rounded-md transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer focus:outline-none" x-text="company.status" title="Click to toggle status"></button>
                                     
-                                    <!-- Edit Button exactly matching reference -->
                                     <div class="flex items-center justify-center gap-1.5 pt-1">
+                                        <a :href="'/admin/login?company=' + company.code" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white p-1.5 rounded-lg shadow-sm hover:scale-105 active:scale-95 transition-all flex items-center justify-center" title="Login to Admin Panel">
+                                            <i class="fa-solid fa-user-shield text-[10px]"></i>
+                                        </a>
+                                        
                                         <button @click="openEditModal(company)" class="bg-amber-500 hover:bg-amber-600 text-white p-1.5 rounded-lg shadow-sm hover:scale-105 active:scale-95 transition-all" title="Edit Company Details">
                                             <i class="fa-solid fa-pen-to-square text-[10px]"></i>
                                         </button>
@@ -175,7 +186,7 @@
                 </div>
 
                 <!-- Form -->
-                <form :action="isEditMode ? '/admin_sys/company/' + form.id + '/update' : '/admin_sys/company'" method="POST" enctype="multipart/form-data" class="p-6 space-y-7 text-xs font-semibold max-h-[80vh] overflow-y-auto">
+                <form id="company-form" action="/admin_sys/company" :action="isEditMode ? '/admin_sys/company/' + form.id + '/update' : '/admin_sys/company'" method="POST" enctype="multipart/form-data" class="p-6 space-y-7 text-xs font-semibold max-h-[80vh] overflow-y-auto">
                     @csrf
                     
                     <!-- 1. MAIN PROPERTIES SECTION -->
@@ -210,13 +221,21 @@
                         <div class="relative">
                             <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Theme<span class="text-crimson-600">*</span></label>
                             <select name="theme" x-model="form.theme" required class="w-full bg-white border border-slate-350 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:outline-none font-bold">
-                                <option value="Theme_1">Theme_1</option>
-                                <option value="Theme_2">Theme_2</option>
+                                <option value="Theme_1">Crimson Red & Gold (Theme 1)</option>
+                                <option value="Theme_2">Indigo Blue & Amber (Theme 2)</option>
+                                <option value="Theme_3">Emerald Green & Orange (Theme 3)</option>
+                                <option value="Theme_4">Purple & Yellow (Theme 4)</option>
+                                <option value="Theme_5">Rose Pink & Teal (Theme 5)</option>
+                                <option value="Theme_6">Cyan & Red-Orange (Theme 6)</option>
+                                <option value="Theme_7">Forest Green & Gold (Theme 7)</option>
+                                <option value="Theme_8">Teal & Rose (Theme 8)</option>
+                                <option value="Theme_9">Charcoal & Amber (Theme 9)</option>
+                                <option value="Theme_10">Slate Blue & Coral (Theme 10)</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
                         <div class="relative">
                             <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Type<span class="text-crimson-600">*</span></label>
                             <select name="type" x-model="form.type" required class="w-full bg-white border border-slate-350 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:outline-none">
@@ -229,6 +248,23 @@
                             <select name="status" x-model="form.status" required class="w-full bg-white border border-slate-350 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:outline-none">
                                 <option value="active">Active</option>
                                 <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="relative">
+                            <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Website Tagline</label>
+                            <input type="text" name="tagline" x-model="form.tagline" class="w-full bg-white border border-slate-350 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:outline-none">
+                        </div>
+                        <div class="relative">
+                            <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Logo Icon (Fallback)</label>
+                            <select name="logo_icon" x-model="form.logo_icon" class="w-full bg-white border border-slate-350 rounded-lg px-3.5 py-3 text-xs text-slate-850 focus:outline-none font-bold">
+                                <option value="fa-solid fa-fire-burner">Fire Burner (Default)</option>
+                                <option value="fa-solid fa-fire">Fire</option>
+                                <option value="fa-solid fa-rocket">Rocket</option>
+                                <option value="fa-solid fa-burst">Burst</option>
+                                <option value="fa-solid fa-bahai">Starburst</option>
+                                <option value="fa-solid fa-bomb">Bomb</option>
+                                <option value="fa-solid fa-gift">Gift</option>
+                                <option value="fa-solid fa-wand-magic-sparkles">Sparkles</option>
                             </select>
                         </div>
                     </div>
@@ -262,8 +298,8 @@
                                 <input type="text" name="contact_5" x-model="form.contact_5" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none font-mono">
                             </div>
                             <div class="relative">
-                                <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Email 1<span class="text-crimson-600">*</span></label>
-                                <input type="email" name="email_1" x-model="form.email_1" required class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none">
+                                <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Email 1</label>
+                                <input type="email" name="email_1" x-model="form.email_1" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none">
                             </div>
                         </div>
 
@@ -345,30 +381,30 @@
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="relative">
                                     <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Bank Name {{ $b }}</label>
-                                    <input type="text" name="bank_name_{{ $b }}" :value="form.bank_name_{{ $b }}" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none">
+                                    <input type="text" name="bank_name_{{ $b }}" x-model="form.bank_name_{{ $b }}" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none">
                                 </div>
                                 <div class="relative">
                                     <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">IFSC Code {{ $b }}</label>
-                                    <input type="text" name="bank_ifsc_{{ $b }}" :value="form.bank_ifsc_{{ $b }}" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none font-mono uppercase">
+                                    <input type="text" name="bank_ifsc_{{ $b }}" x-model="form.bank_ifsc_{{ $b }}" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none font-mono uppercase">
                                 </div>
                                 <div class="relative">
                                     <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Account No. {{ $b }}</label>
-                                    <input type="text" name="bank_acc_{{ $b }}" :value="form.bank_acc_{{ $b }}" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none font-mono">
+                                    <input type="text" name="bank_acc_{{ $b }}" x-model="form.bank_acc_{{ $b }}" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none font-mono">
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="relative">
                                     <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Branch {{ $b }}</label>
-                                    <input type="text" name="bank_branch_{{ $b }}" :value="form.bank_branch_{{ $b }}" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none">
+                                    <input type="text" name="bank_branch_{{ $b }}" x-model="form.bank_branch_{{ $b }}" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none">
                                 </div>
                                 <div class="relative">
                                     <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Account Type {{ $b }}</label>
-                                    <input type="text" name="bank_type_{{ $b }}" :value="form.bank_type_{{ $b }}" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none">
+                                    <input type="text" name="bank_type_{{ $b }}" x-model="form.bank_type_{{ $b }}" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none">
                                 </div>
                                 <div class="relative">
                                     <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Holder Name {{ $b }}</label>
-                                    <input type="text" name="bank_holder_{{ $b }}" :value="form.bank_holder_{{ $b }}" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none">
+                                    <input type="text" name="bank_holder_{{ $b }}" x-model="form.bank_holder_{{ $b }}" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none">
                                 </div>
                             </div>
                         </div>
@@ -560,7 +596,10 @@
                                         <img :src="'/' + form.logo_path" class="object-contain max-h-full max-w-full">
                                     </template>
                                     <template x-if="!form.logo_path">
-                                        <i class="fa-solid fa-image text-slate-300 text-lg"></i>
+                                        <div class="flex items-center gap-1.5 text-slate-400">
+                                            <i :class="form.logo_icon || 'fa-solid fa-fire-burner'" class="text-sm"></i>
+                                            <span class="text-[9px] font-bold uppercase tracking-wider">Icon Logo</span>
+                                        </div>
                                     </template>
                                 </div>
                                 <div class="relative w-full">
@@ -592,7 +631,9 @@
                     <div class="flex justify-end gap-3 pt-5 border-t border-slate-150 select-none">
                         <button type="button" @click="modalOpen = false" class="bg-slate-500 hover:bg-slate-600 text-white font-extrabold px-6 py-2.5 rounded-xl transition-all shadow-sm select-none">Close</button>
                         <button type="button" @click="clearForm()" class="bg-amber-500 hover:bg-amber-600 text-white font-extrabold px-6 py-2.5 rounded-xl transition-all shadow-sm select-none">Clear</button>
-                        <button type="submit" class="bg-{{ $currentTheme['accent'] }} hover:bg-{{ $currentTheme['accent_hover'] }} text-{{ $theme === 'gold' ? 'slate-950' : 'white' }} font-extrabold px-6 py-2.5 rounded-xl transition-all shadow shadow-{{ $currentTheme['accent'] }}/10 select-none" x-text="isEditMode ? 'Save changes' : 'Add Company'"></button>
+                        <button type="submit" class="bg-{{ $currentTheme['accent'] }} hover:bg-{{ $currentTheme['accent_hover'] }} text-{{ $theme === 'gold' ? 'slate-950' : 'white' }} font-extrabold px-6 py-2.5 rounded-xl transition-all shadow shadow-{{ $currentTheme['accent'] }}/10 select-none">
+                            <span x-text="isEditMode ? 'Save changes' : 'Add Company'"></span>
+                        </button>
                     </div>
 
                 </form>
@@ -661,7 +702,7 @@
 
                 // Socials Overview
                 fb_link: '', tw_link: '', yt_link: '', wa_link: '', ig_link: '', pin_link: '', copyright_text: '',
-                logo_path: '', favicon_path: ''
+                logo_path: '', favicon_path: '', logo_icon: 'fa-solid fa-fire-burner'
             },
             
             deleteId: null,
@@ -699,6 +740,7 @@
                     theme: 'Theme_1',
                     type: 'Premium',
                     status: 'active',
+                    tagline: 'Sivakasi Online Booking',
                     
                     // Contacts
                     contact_1: '', contact_2: '', contact_3: '', contact_4: '', contact_5: '',
@@ -729,7 +771,7 @@
 
                     // Socials Overview
                     fb_link: '', tw_link: '', yt_link: '', wa_link: '', ig_link: '', pin_link: '', copyright_text: '',
-                    logo_path: '', favicon_path: ''
+                    logo_path: '', favicon_path: '', logo_icon: 'fa-solid fa-fire-burner'
                 };
                 this.modalOpen = true;
             },
@@ -747,7 +789,7 @@
             clearFormFields() {
                 this.form = {
                     id: '', code: '', name: '', website: '', gst_number: '', pan_number: '', msme_number: '',
-                    theme: 'Theme_1', type: 'Premium', status: 'active',
+                    theme: 'Theme_1', type: 'Premium', status: 'active', tagline: '',
                     contact_1: '', contact_2: '', contact_3: '', contact_4: '', contact_5: '',
                     email_1: '', email_2: '', address_1: '', address_2: '',
                     state: 'Tamilnadu', city: 'Virudhunagar', pincode: '', map_link: '',
@@ -759,7 +801,7 @@
                     sms_header: '', sms_apikey: '', sms_balance: '',
                     min_purchase: '3800', tax_calc: 'No', delivery_calc: 'No',
                     fb_link: '', tw_link: '', yt_link: '', wa_link: '', ig_link: '', pin_link: '', copyright_text: '',
-                    logo_path: '', favicon_path: ''
+                    logo_path: '', favicon_path: '', logo_icon: 'fa-solid fa-fire-burner'
                 };
             },
 
@@ -776,10 +818,57 @@
                     cancelButtonText: 'Cancel'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        this.$nextTick(() => {
-                            document.getElementById('delete-form').submit();
+                        const form = document.getElementById('delete-form');
+                        form.action = '/admin_sys/company/' + id;
+                        form.submit();
+                    }
+                });
+            },
+
+            toggleStatus(company) {
+                const oldStatus = company.status;
+                const newStatus = (oldStatus === 'active') ? 'inactive' : 'active';
+                company.status = newStatus; // Optimistic update
+                
+                fetch('/admin_sys/company/' + company.id + '/toggle-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('HTTP error ' + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        company.status = data.status;
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: data.message,
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+                    } else {
+                        company.status = oldStatus;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to update status',
+                            text: data.message || 'An error occurred.'
                         });
                     }
+                })
+                .catch(err => {
+                    company.status = oldStatus;
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Network error or authorization failed.'
+                    });
                 });
             }
         };
