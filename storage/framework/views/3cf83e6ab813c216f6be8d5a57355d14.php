@@ -10,7 +10,7 @@
         </div>
         <h2 class="text-3xl font-extrabold tracking-tight text-slate-950">Order Booking Successful!</h2>
         <p class="text-xs text-slate-500 max-w-lg mx-auto leading-relaxed font-semibold">
-            Your booking is registered. Please complete the UPI or bank transfer payment below to dispatch your Sivakasi crackers!
+            Your booking is registered. Please click the WhatsApp button below to confirm your order details and coordinate delivery options!
         </p>
     </div>
 
@@ -141,72 +141,22 @@
         <!-- Right: Payment QR and WhatsApp validation (ColSpan 1) -->
         <div class="space-y-6">
             
-            <!-- Dynamic QR Code Card -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-center space-y-4">
-                <span class="inline-flex bg-crimson-50 border border-crimson-100 text-crimson-700 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">
-                    <i class="fa-solid fa-qrcode mr-1"></i> Scan to Pay
-                </span>
-                
-                <h4 class="text-xs font-bold text-slate-700 uppercase tracking-widest">Instant UPI Payment</h4>
-                
-                <!-- Renders custom Google Chart QR code containing local payee parameters -->
-                <div class="bg-white p-3 rounded-2xl inline-block shadow-sm ring-1 ring-slate-200 select-none">
-                    <img src="<?php echo e($qrCodeUrl); ?>" alt="UPI QR Code" class="w-44 h-44">
-                </div>
-                
-                <div class="text-[10px] text-slate-650 leading-normal space-y-1 select-all font-semibold">
-                    <p class="font-extrabold text-slate-800">UPI Address: <span class="text-crimson-650 font-mono"><?php echo e(App\Models\Setting::get('store_upi', 'aathishacrackers@okaxis')); ?></span></p>
-                    <p>Payee: <?php echo e(App\Models\Setting::get('store_name', 'Aathisha Crackers')); ?></p>
-                    <p class="font-extrabold text-emerald-600">Payable Total: ₹<?php echo e(number_format($order->net_amount, 2)); ?></p>
-                </div>
-                
-                <p class="text-[9px] text-slate-400 leading-normal border-t border-slate-150 pt-3 font-medium">
-                    Open any UPI App (GPay, PhonePe, Paytm, BHIM) and scan the QR code to complete payment.
-                </p>
-            </div>
-
-            <!-- WhatsApp Screenshot Verification Card -->
+            <!-- WhatsApp Booking Confirmation Card -->
             <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4 text-center">
                 <span class="inline-flex bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">
-                    <i class="fa-brands fa-whatsapp mr-1"></i> Fast Verification
+                    <i class="fa-brands fa-whatsapp mr-1"></i> Fast Confirmation
                 </span>
                 
-                <h4 class="text-xs font-bold text-slate-700 uppercase tracking-widest">Send Payment Receipt</h4>
+                <h4 class="text-xs font-bold text-slate-700 uppercase tracking-widest">Confirm Booking</h4>
                 
                 <p class="text-[10px] text-slate-500 leading-relaxed font-semibold">
-                    Once paid, please snap a screenshot of the payment confirmation and share it with us on WhatsApp to verify and dispatch your items!
+                    Please share your order details with us on WhatsApp to verify your booking and discuss delivery and offline payment logistics!
                 </p>
                 
                 <a href="<?php echo e($whatsappUrl); ?>" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-3 rounded-full text-xs uppercase tracking-wider shadow-md shadow-emerald-100 flex items-center justify-center gap-2 transform active:scale-95 transition-all">
                     <i class="fa-brands fa-whatsapp text-sm"></i>
-                    <span>Share on WhatsApp</span>
+                    <span>Confirm on WhatsApp</span>
                 </a>
-            </div>
-
-            <!-- Direct Bank details in case of failures -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-3.5">
-                <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                    <i class="fa-solid fa-building-columns text-crimson-600"></i> Bank Transfer Details
-                </h4>
-                
-                <div class="text-[11px] text-slate-500 space-y-2 border-t border-slate-150 pt-3 font-semibold">
-                    <div class="flex justify-between border-b border-slate-100 pb-1.5 select-all">
-                        <span>Bank Name:</span>
-                        <strong class="text-slate-800"><?php echo e($bankDetails['name']); ?></strong>
-                    </div>
-                    <div class="flex justify-between border-b border-slate-100 pb-1.5 select-all">
-                        <span>Account Holder:</span>
-                        <strong class="text-slate-800"><?php echo e($bankDetails['holder']); ?></strong>
-                    </div>
-                    <div class="flex justify-between border-b border-slate-100 pb-1.5 select-all">
-                        <span>Account Number:</span>
-                        <strong class="text-slate-800 font-mono"><?php echo e($bankDetails['acc_no']); ?></strong>
-                    </div>
-                    <div class="flex justify-between pb-0.5 select-all">
-                        <span>IFSC Code:</span>
-                        <strong class="text-slate-800 font-mono"><?php echo e($bankDetails['ifsc']); ?></strong>
-                    </div>
-                </div>
             </div>
 
         </div>

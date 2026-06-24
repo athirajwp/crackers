@@ -96,8 +96,8 @@
                     </div>
                 </div>
 
-                <!-- Row 3: Twitter, Facebook, Bank Name -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Row 3: Twitter, Facebook -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div class="relative">
                         <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Twitter Link</label>
                         <input type="text" name="twitter_link" value="{{ $settings['twitter_link'] }}" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-{{ $currentTheme['accent'] }} focus:outline-none transition-all">
@@ -105,38 +105,6 @@
                     <div class="relative">
                         <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Facebook Link</label>
                         <input type="text" name="facebook_link" value="{{ $settings['facebook_link'] }}" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-{{ $currentTheme['accent'] }} focus:outline-none transition-all">
-                    </div>
-                    <div class="relative">
-                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Bank Name</label>
-                        <input type="text" name="bank_name" value="{{ $settings['bank_name'] }}" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-{{ $currentTheme['accent'] }} focus:outline-none transition-all">
-                    </div>
-                </div>
-
-                <!-- Row 4: IFSC, Acc No, Branch -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <div class="relative">
-                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">IFSC Code</label>
-                        <input type="text" name="bank_ifsc" value="{{ $settings['bank_ifsc'] }}" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-{{ $currentTheme['accent'] }} focus:outline-none transition-all font-mono uppercase">
-                    </div>
-                    <div class="relative">
-                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Account No.</label>
-                        <input type="text" name="bank_acc_no" value="{{ $settings['bank_acc_no'] }}" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-{{ $currentTheme['accent'] }} focus:outline-none transition-all font-mono">
-                    </div>
-                    <div class="relative">
-                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Branch</label>
-                        <input type="text" name="bank_branch" value="{{ $settings['bank_branch'] }}" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-{{ $currentTheme['accent'] }} focus:outline-none transition-all">
-                    </div>
-                </div>
-
-                <!-- Row 5: Account Type, Holder Name -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <div class="relative col-span-1">
-                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Account Type</label>
-                        <input type="text" name="bank_acc_type" value="{{ $settings['bank_acc_type'] }}" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-{{ $currentTheme['accent'] }} focus:outline-none transition-all">
-                    </div>
-                    <div class="relative col-span-1 lg:col-span-2">
-                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Holder Name</label>
-                        <input type="text" name="bank_holder" value="{{ $settings['bank_holder'] }}" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-{{ $currentTheme['accent'] }} focus:outline-none transition-all">
                     </div>
                 </div>
 

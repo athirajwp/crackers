@@ -96,7 +96,15 @@
                                 <!-- Details -->
                                 <td class="py-3.5 px-4 border-r border-slate-150 space-y-1">
                                     <div class="text-slate-850 font-black" x-text="'Name : ' + company.name"></div>
-                                    <div class="text-[10px] text-slate-500" x-text="'Email : ' + (company.email_1 || '—')"></div>
+                                    <div class="text-[10px] text-slate-500">
+                                        Email : 
+                                        <template x-if="company.email_1">
+                                            <a :href="'mailto:' + company.email_1" class="text-blue-600 hover:underline" x-text="company.email_1"></a>
+                                        </template>
+                                        <template x-if="!company.email_1">
+                                            <span>—</span>
+                                        </template>
+                                    </div>
                                     <div class="text-[10px] text-slate-500 font-mono" x-text="'Mobile Number : ' + (company.contact_1 || '—')"></div>
                                 </td>
                                 

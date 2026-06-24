@@ -171,7 +171,7 @@
                 </td>
                 <td class="info-col" style="padding-left: 20px;">
                     <div class="info-title">Booking Details</div>
-                    <strong>Payment Mode:</strong> UPI Transfer / Bank Transfer<br>
+                    <strong>Payment Mode:</strong> Offline Payment<br>
                     <strong>Payment Status:</strong> {{ strtoupper($order->payment_status) }}<br>
                     @if($order->transport_name)
                         <strong>Transport Lorry:</strong> {{ $order->transport_name }}<br>
@@ -229,7 +229,7 @@
 
         <!-- Direct payment instructions & footer details -->
         <div style="font-size: 10px; margin-bottom: 20px; background: #f9f9f9; padding: 10px; border: 1px solid #dddddd;">
-            <strong>Payment Instructions:</strong> Complete pay transfer to UPI Address: <u>{{ App\Models\Setting::get('store_upi', 'aathishacrackers@okaxis') }}</u>. Or transfer to SBI Bank A/c: <u>{{ App\Models\Setting::get('bank_acc_no', '1234567890') }}</u> (IFSC: {{ App\Models\Setting::get('bank_ifsc', 'SBIN0000123') }}, Holder: {{ App\Models\Setting::get('bank_holder', 'Cracker Demo') }}).
+            <strong>Instructions:</strong> Please contact support via WhatsApp to confirm the offline payment options and coordinate delivery logistics.
         </div>
 
         <div class="footer-note">

@@ -238,7 +238,7 @@ class CheckoutController extends Controller
                    . "*Order Number:* {$order->order_number}\n"
                    . "*Customer Name:* {$order->name}\n"
                    . "*Total Amount:* ₹" . number_format($order->net_amount, 2) . "\n\n"
-                   . "I am attaching the payment screenshot below for verification.";
+                   . "Please confirm my booking and coordinate delivery details.";
         
         $whatsappUrl = "https://api.whatsapp.com/send?phone={$whatsappNum}&text=" . urlencode($waMessage);
 

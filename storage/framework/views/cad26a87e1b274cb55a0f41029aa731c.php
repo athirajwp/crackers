@@ -114,7 +114,7 @@
                     <span class="bg-gradient-to-r from-crimson-600 to-crimson-500 bg-clip-text text-transparent">Flat <?php echo e($settings['discount_percent']); ?>% Discount!</span>
                 </h2>
                 <p class="text-xs md:text-sm text-slate-650 max-w-2xl mx-auto leading-relaxed font-semibold">
-                    Add Sivakasi-manufactured fireworks directly from our price list. Minimum order value is ₹<?php echo e(number_format($settings['min_order_value'])); ?>. Place your order, check out, pay via UPI, and receive shipment details via WhatsApp!
+                    Add Sivakasi-manufactured fireworks directly from our price list. Minimum order value is ₹<?php echo e(number_format($settings['min_order_value'])); ?>. Place your order, check out, and receive shipment details via WhatsApp!
                 </p>
             </div>
 
@@ -137,7 +137,7 @@
                     <i class="fa-solid fa-badge-check text-crimson-600 text-[11px]"></i> Sulphurless Sparklers
                 </div>
                 <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200/60 px-3 py-1.5 rounded-xl text-[10px] font-bold text-slate-600">
-                    <i class="fa-solid fa-circle-check text-crimson-600 text-[11px]"></i> Secure UPI Payments
+                    <i class="fa-solid fa-circle-check text-crimson-600 text-[11px]"></i> Easy Offline Booking
                 </div>
             </div>
         </div>
@@ -515,7 +515,7 @@
                                 <template x-if="!submitting">
                                     <i class="fa-solid fa-file-invoice-dollar mr-1"></i>
                                 </template>
-                                <span x-text="submitting ? 'Placing Order...' : 'Submit & Get UPI Invoice'">Submit & Get UPI Invoice</span>
+                                <span x-text="submitting ? 'Placing Order...' : 'Submit & Confirm Booking'">Submit & Confirm Booking</span>
                             </button>
                         </div>                        </div>
 

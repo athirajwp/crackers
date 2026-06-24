@@ -52,11 +52,11 @@ class SettingController extends Controller
             'store_phone' => 'required|string|max:20',
             'store_email' => 'required|email|max:255',
             'store_address' => 'required|string',
-            'store_upi' => 'required|string|max:255',
-            'bank_name' => 'required|string|max:255',
-            'bank_acc_no' => 'required|string|max:255',
-            'bank_ifsc' => 'required|string|max:255',
-            'bank_holder' => 'required|string|max:255',
+            'store_upi' => 'nullable|string|max:255',
+            'bank_name' => 'nullable|string|max:255',
+            'bank_acc_no' => 'nullable|string|max:255',
+            'bank_ifsc' => 'nullable|string|max:255',
+            'bank_holder' => 'nullable|string|max:255',
             
             // Feature flags validation
             'enable_min_order' => 'required|in:yes,no',
@@ -79,11 +79,11 @@ class SettingController extends Controller
         Setting::set('store_phone', $request->store_phone, 'text');
         Setting::set('store_email', $request->store_email, 'text');
         Setting::set('store_address', $request->store_address, 'textarea');
-        Setting::set('store_upi', $request->store_upi, 'text');
-        Setting::set('bank_name', $request->bank_name, 'text');
-        Setting::set('bank_acc_no', $request->bank_acc_no, 'text');
-        Setting::set('bank_ifsc', $request->bank_ifsc, 'text');
-        Setting::set('bank_holder', $request->bank_holder, 'text');
+        Setting::set('store_upi', $request->store_upi ?? '', 'text');
+        Setting::set('bank_name', $request->bank_name ?? '', 'text');
+        Setting::set('bank_acc_no', $request->bank_acc_no ?? '', 'text');
+        Setting::set('bank_ifsc', $request->bank_ifsc ?? '', 'text');
+        Setting::set('bank_holder', $request->bank_holder ?? '', 'text');
         
         // Save feature flags
         Setting::set('enable_min_order', $request->enable_min_order, 'text');

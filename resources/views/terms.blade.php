@@ -63,13 +63,13 @@
 
                         <div class="space-y-3">
                             <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
-                                <i class="fa-solid fa-circle-check text-crimson-600"></i> 3. Payment Terms & Instant UPI Verification
+                                <i class="fa-solid fa-circle-check text-crimson-600"></i> 3. Payment & Booking Terms
                             </h3>
                             <p>
-                                We operate strictly on a 100% advance payment model due to transport agency rules for carrying explosive cargo. 
+                                We operate on a booking estimation model. No online payments are accepted on this website due to regulatory guidelines.
                             </p>
                             <p>
-                                Upon finalizing checkout, a secure invoice containing our official QR code and UPI address (<strong>{{ App\Models\Setting::get('store_upi', 'aathishacrackers@okaxis') }}</strong>) is generated. You are requested to complete the transaction and click the WhatsApp confirmation link to share your receipt screenshot. Orders will enter processing status only upon manual verification of receipt logs.
+                                Upon finalizing your checkout, a booking invoice summary is generated. Please click the WhatsApp button to share your booking reference with us. Our representative will contact you to verify details, discuss payment terms, and complete the order processing offline.
                             </p>
                         </div>
 
