@@ -337,16 +337,29 @@
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans selection:bg-gold-500 selection:text-slate-900">
     
     <!-- 1. Scrolling Marquee Header Alert -->
+    @php
+        $marqueeAlerts = [
+            1 => ['icon' => 'fa-bullhorn', 'color' => 'text-gold-200', 'default' => 'Fresh and Warm Bakes Everyday'],
+            2 => ['icon' => 'fa-circle-exclamation', 'color' => '', 'default' => 'Minimum Order Value for Sivakasi Delivery is <strong>₹1000</strong>'],
+            3 => ['icon' => 'fa-fire', 'color' => '', 'default' => 'Celebrate Diwali / Festivals with Flat <strong>60% Discount</strong>!'],
+            4 => ['icon' => 'fa-truck-fast', 'color' => '', 'default' => 'Express Lorry Transport Delivery Across Kerala, Karnataka, Tamilnadu, Andhra & Telangana!'],
+            5 => ['icon' => 'fa-phone', 'color' => '', 'default' => 'For Enquiries, Contact Support: <strong>8682942042</strong>'],
+            6 => ['icon' => 'fa-shield-halved', 'color' => '', 'default' => '100% Quality & Safe Sivakasi Manufactured Crackers']
+        ];
+    @endphp
     <div class="bg-crimson-700 border-b border-crimson-800 text-white py-2 text-xs font-semibold marquee-container shadow-sm select-none">
         <div class="marquee-content flex gap-12 items-center">
-            @if($bannerScroller = App\Models\Setting::get('banner_scroller'))
-                <span class="text-gold-200"><i class="fa-solid fa-bullhorn text-gold-300 mr-2"></i><strong>{{ $bannerScroller }}</strong></span>
-            @endif
-            <span><i class="fa-solid fa-circle-exclamation text-gold-300 mr-2"></i>Minimum Order Value for Sivakasi Delivery is <strong>₹{{ App\Models\Setting::get('min_order_value', 3800) }}</strong></span>
-            <span><i class="fa-solid fa-fire text-gold-300 mr-2"></i>Celebrate Diwali / Festivals with Flat <strong>{{ App\Models\Setting::get('discount_percent', 60) }}% Discount</strong>!</span>
-            <span><i class="fa-solid fa-truck-fast text-gold-300 mr-2"></i>Express Lorry Transport Delivery Across Kerala, Karnataka, Tamilnadu, Andhra & Telangana!</span>
-            <span><i class="fa-solid fa-phone text-gold-300 mr-2"></i>For Enquiries, Contact Support: <strong>{{ App\Models\Setting::get('store_phone', '+91 9998887776') }}</strong></span>
-            <span><i class="fa-solid fa-shield-halved text-gold-300 mr-2"></i>100% Quality & Safe Sivakasi Manufactured Crackers</span>
+            @foreach($marqueeAlerts as $num => $alert)
+                @php
+                    $val = App\Models\Setting::get("marquee_alert_{$num}", $alert['default']);
+                @endphp
+                @if(!empty(trim($val)))
+                    <span class="{{ $alert['color'] }}">
+                        <i class="fa-solid {{ $alert['icon'] }} text-gold-300 mr-2"></i>
+                        {!! $val !!}
+                    </span>
+                @endif
+            @endforeach
         </div>
     </div>
 

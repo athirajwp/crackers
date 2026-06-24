@@ -14,7 +14,12 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with('category')->orderBy('created_at', 'desc')->get();
+        $products = Product::with('category')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->orderBy('categories.sort_order', 'asc')
+            ->orderBy('products.sort_order', 'asc')
+            ->select('products.*')
+            ->get();
         $categories = Category::all();
         return view('admin.products.index', compact('products', 'categories'));
     }
@@ -39,6 +44,7 @@ class ProductController extends Controller
             'pack_size' => 'required|string|max:255',
             'mrp' => 'required|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',
+            'sort_order' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'status' => 'required|in:active,inactive',
         ]);
@@ -61,6 +67,7 @@ class ProductController extends Controller
             'pack_size' => $request->pack_size,
             'mrp' => $request->mrp,
             'selling_price' => $request->selling_price,
+            'sort_order' => $request->sort_order,
             'image' => $imagePath,
             'status' => $request->status,
         ]);
@@ -88,6 +95,7 @@ class ProductController extends Controller
             'pack_size' => 'required|string|max:255',
             'mrp' => 'required|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',
+            'sort_order' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'status' => 'required|in:active,inactive',
         ]);
@@ -115,6 +123,7 @@ class ProductController extends Controller
             'pack_size' => $request->pack_size,
             'mrp' => $request->mrp,
             'selling_price' => $request->selling_price,
+            'sort_order' => $request->sort_order,
             'image' => $imagePath,
             'status' => $request->status,
         ]);

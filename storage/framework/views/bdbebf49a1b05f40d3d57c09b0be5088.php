@@ -41,10 +41,10 @@
     <?php endif; ?>
 
     <!-- Main Config Form -->
-    <form action="<?php echo e(route('admin.settings.update')); ?>" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-2 gap-8 text-xs font-semibold">
+    <form action="<?php echo e(route('admin.settings.update')); ?>" method="POST" enctype="multipart/form-data" class="max-w-3xl mx-auto text-xs font-semibold">
         <?php echo csrf_field(); ?>
         
-        <!-- Left: General Configurations & Support -->
+        <!-- General Configurations & Support -->
         <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-3 flex items-center gap-1.5"><i class="fa-solid fa-gears text-<?php echo e($currentTheme['accent']); ?>"></i> General Configuration</h3>
             
@@ -117,68 +117,18 @@
                         </select>
                     </div>
                     <div class="space-y-1.5">
-                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">GST Rate (%)</label>
+                        <label class="block text-[9px] font-bold text-slate-550 uppercase tracking-wider mb-1 px-0.5">GST Rate (%)</label>
                         <input type="number" min="0" max="100" name="tax_percent" value="<?php echo e($settings['tax_percent'] ?? 18); ?>" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all font-mono">
                     </div>
                     <div class="space-y-1.5">
-                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Delivery Fee (₹)</label>
+                        <label class="block text-[9px] font-bold text-slate-550 uppercase tracking-wider mb-1 px-0.5">Delivery Fee (₹)</label>
                         <input type="number" min="0" name="delivery_charge" value="<?php echo e($settings['delivery_charge'] ?? 150); ?>" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all font-mono">
                     </div>
                 </div>
             </div>
 
-        </div>
-
-        <!-- Right: Payment UPI Profiles & Direct Bank details -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between gap-6">
-            
-            <div class="space-y-6">
-                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-3 flex items-center gap-1.5"><i class="fa-solid fa-qrcode text-<?php echo e($currentTheme['accent']); ?>"></i> Payment Gateways & Banking</h3>
-                
-                <div class="space-y-1.5">
-                    <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Active UPI Payment ID (VPA)</label>
-                    <input type="text" name="store_upi" required value="<?php echo e($settings['store_upi']); ?>" placeholder="username@bank" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all font-mono">
-                    <span class="text-[9px] text-slate-450 block leading-normal px-0.5 font-semibold"><i class="fa-solid fa-circle-info text-<?php echo e($currentTheme['accent']); ?>"></i> Used for generating the dynamic GPay/PhonePe scan-to-pay QR codes. Make sure this ID is correct.</span>
-                </div>
-
-                <div class="space-y-1.5 border-t border-slate-200 pt-4">
-                    <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">UPI QR Code Image (Custom Upload)</label>
-                    <div class="flex items-center gap-4">
-                        <?php if(!empty($settings['store_upi_qr'])): ?>
-                            <div class="w-16 h-16 rounded-xl bg-slate-50 border border-slate-200 overflow-hidden flex items-center justify-center text-slate-300 flex-shrink-0 shadow-sm relative group">
-                                <img src="/<?php echo e($settings['store_upi_qr']); ?>" class="object-cover w-full h-full">
-                            </div>
-                        <?php endif; ?>
-                        <input type="file" name="store_upi_qr" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2 text-xs text-slate-800 focus:outline-none transition-all">
-                    </div>
-                    <span class="text-[9px] text-slate-450 block leading-normal px-0.5 font-semibold"><i class="fa-solid fa-circle-info text-<?php echo e($currentTheme['accent']); ?>"></i> Upload your custom static QR code image to replace the Google Charts auto-generated UPI QR code.</span>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4 border-t border-slate-200 pt-4">
-                    <div class="space-y-1.5">
-                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Bank Name</label>
-                        <input type="text" name="bank_name" required value="<?php echo e($settings['bank_name']); ?>" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Account Holder Name</label>
-                        <input type="text" name="bank_holder" required value="<?php echo e($settings['bank_holder']); ?>" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1.5">
-                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Bank Account Number</label>
-                        <input type="text" name="bank_acc_no" required value="<?php echo e($settings['bank_acc_no']); ?>" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all font-mono">
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Bank IFSC Code</label>
-                        <input type="text" name="bank_ifsc" required value="<?php echo e($settings['bank_ifsc']); ?>" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all font-mono font-bold">
-                    </div>
-                </div>
-            </div>
-
             <!-- Submit action -->
-            <div class="pt-6 lg:pt-0">
+            <div class="pt-6 border-t border-slate-200">
                 <button type="submit" class="w-full bg-gradient-to-r from-<?php echo e($currentTheme['accent']); ?> to-<?php echo e($currentTheme['accent']); ?>/90 hover:opacity-95 text-white font-extrabold py-3.5 rounded-full text-xs uppercase tracking-wider shadow transform active:scale-95 transition-all flex items-center justify-center gap-1.5">
                     <i class="fa-solid fa-floppy-disk text-[11px]"></i>
                     <span>Save All Settings</span>
@@ -186,7 +136,6 @@
             </div>
 
         </div>
-
     </form>
 
 </div>

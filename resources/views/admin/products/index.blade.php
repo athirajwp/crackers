@@ -76,6 +76,7 @@
                         <th class="hidden sm:table-cell py-4 px-4 w-40">Category</th>
                         <th class="hidden sm:table-cell py-4 px-4 w-28 text-center">Pack</th>
                         <th class="py-4 px-4 w-32 text-right">Pricing (MRP/Sell)</th>
+                        <th class="py-4 px-4 w-20 text-center">Sort Order</th>
                         <th class="py-4 px-4 w-24 text-center">Status</th>
                         <th class="py-4 px-4 w-28 text-center pr-4">Actions</th>
                     </tr>
@@ -121,6 +122,11 @@
                                 <div class="text-[9px] text-emerald-600 font-bold">({{ $product->discount_percentage }}% Off)</div>
                             </td>
 
+                            <!-- Sort Order -->
+                            <td class="py-3 px-4 text-center font-mono text-slate-700 font-bold">
+                                {{ $product->sort_order }}
+                            </td>
+
                             <!-- Status -->
                             <td class="py-3 px-4 text-center">
                                 <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider 
@@ -139,6 +145,7 @@
                                                 pack_size: '{{ addslashes($product->pack_size) }}', 
                                                 mrp: {{ $product->mrp }}, 
                                                 selling_price: {{ $product->selling_price }}, 
+                                                sort_order: {{ $product->sort_order }}, 
                                                 status: '{{ $product->status }}' 
                                             }; editOpen = true" class="bg-slate-50 hover:bg-slate-100 border border-slate-200 w-8 h-8 rounded-lg text-slate-600 hover:text-slate-900 transition-colors shadow-sm" title="Edit Product">
                                         <i class="fa-solid fa-pen-to-square text-xs"></i>
@@ -231,6 +238,11 @@
                         </div>
 
                         <div>
+                            <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Sort Order</label>
+                            <input type="number" name="sort_order" required value="999" min="0" placeholder="e.g. 10" class="w-full bg-slate-50 border border-slate-200 focus:border-slate-350 focus:bg-white rounded-xl px-3 py-2 text-slate-700 focus:outline-none transition-all">
+                        </div>
+
+                        <div>
                             <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Product Image Graphics</label>
                             <input type="file" name="image" class="w-full bg-slate-50 border border-slate-200 focus:border-slate-350 focus:bg-white rounded-xl px-3 py-2 text-slate-600 focus:outline-none transition-all">
                         </div>
@@ -300,6 +312,11 @@
                                     <option value="inactive">Inactive</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Sort Order</label>
+                            <input type="number" name="sort_order" required :value="editItem.sort_order" min="0" class="w-full bg-slate-50 border border-slate-200 focus:border-slate-350 focus:bg-white rounded-xl px-3 py-2 text-slate-700 focus:outline-none transition-all">
                         </div>
 
                         <div>

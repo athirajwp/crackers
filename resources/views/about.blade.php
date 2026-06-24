@@ -110,8 +110,62 @@
                 </div>
             </div>
 
+    </section>
+
+    @php
+        $galleryImages = [];
+        for ($i = 1; $i <= 18; $i++) {
+            $path = App\Models\Setting::get("gallery_image_{$i}");
+            if (!empty($path) && file_exists(public_path($path))) {
+                $galleryImages[] = '/' . $path;
+            }
+        }
+    @endphp
+
+    @if(count($galleryImages) > 0)
+    <!-- Gallery Section -->
+    <section class="container mx-auto px-4 py-16 border-t border-slate-200" x-data="{ lightboxOpen: false, lightboxImg: '' }">
+        <div class="text-center space-y-4 mb-10 select-none">
+            <span class="inline-flex items-center gap-1.5 bg-crimson-50 border border-crimson-100 text-crimson-700 text-xs font-extrabold uppercase tracking-widest px-3.5 py-1.5 rounded-full shadow-sm">
+                <i class="fa-solid fa-images text-crimson-600"></i> Gallery
+            </span>
+            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">Capturing Our Celebrations & Infrastructure</h2>
+            <p class="text-xs text-slate-500 max-w-lg mx-auto leading-relaxed font-semibold">
+                Take a visual tour of our wholesale crackers godowns, safety packaging standards, and vibrant celebrations.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+            @foreach($galleryImages as $imgUrl)
+            <div @click="lightboxOpen = true; lightboxImg = '{{ $imgUrl }}'" class="cursor-pointer overflow-hidden rounded-2xl border border-slate-200 shadow-sm relative group aspect-video">
+                <img src="{{ $imgUrl }}" class="object-cover w-full h-full transform group-hover:scale-105 transition-all duration-500">
+                <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <i class="fa-solid fa-magnifying-glass-plus text-white text-2xl"></i>
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        <!-- Lightbox Modal -->
+        <div x-show="lightboxOpen" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4"
+             style="display: none;"
+             @click="lightboxOpen = false">
+            <div class="relative max-w-4xl max-h-[90vh] bg-white p-2 rounded-3xl overflow-hidden shadow-2xl" @click.stop>
+                <button @click="lightboxOpen = false" class="absolute top-4 right-4 bg-slate-900/60 hover:bg-slate-900/80 text-white rounded-full p-2.5 transition-colors focus:outline-none z-10">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+                <img :src="lightboxImg" class="max-w-full max-h-[80vh] rounded-2xl object-contain">
+            </div>
         </div>
     </section>
+    @endif
 
     <!-- 3. Dynamic Interactive CTA Section -->
     <section class="bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-950 text-white py-16 relative overflow-hidden select-none shadow-inner border-y border-slate-900">

@@ -249,20 +249,10 @@
 
                 <!-- Summary Totals -->
                 <table class="totals-table">
-                    <tr>
-                        <td style="width: 60%;"></td>
-                        <td style="text-align: right; font-weight: 500;">MRP Sum:</td>
-                        <td style="text-align: right; width: 100px; font-weight: 600;">₹{{ number_format($order->subtotal, 2) }}</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td style="text-align: right; font-weight: 500;">Wholesale Discount:</td>
-                        <td style="text-align: right; font-weight: 600; color: #16a34a;">-₹{{ number_format($order->discount_amount, 2) }}</td>
-                    </tr>
                     <tr class="grand-total">
-                        <td></td>
-                        <td style="text-align: right;">Net Payable:</td>
-                        <td style="text-align: right;" class="amount">₹{{ number_format($order->net_amount, 2) }}</td>
+                        <td style="width: 60%;"></td>
+                        <td style="text-align: right; font-weight: bold; padding-top: 10px; font-size: 14px;">Net Paid:</td>
+                        <td style="text-align: right; width: 100px; font-weight: bold; color: #b91c1c; padding-top: 10px; font-size: 14px;">₹{{ number_format($order->net_amount, 2) }}</td>
                     </tr>
                 </table>
 

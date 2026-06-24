@@ -96,8 +96,8 @@
                     </div>
                 </div>
 
-                <!-- Row 3: Twitter, Facebook, Bank Name -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Row 3: Twitter, Facebook -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div class="relative">
                         <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Twitter Link</label>
                         <input type="text" name="twitter_link" value="<?php echo e($settings['twitter_link']); ?>" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-<?php echo e($currentTheme['accent']); ?> focus:outline-none transition-all">
@@ -105,38 +105,6 @@
                     <div class="relative">
                         <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Facebook Link</label>
                         <input type="text" name="facebook_link" value="<?php echo e($settings['facebook_link']); ?>" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-<?php echo e($currentTheme['accent']); ?> focus:outline-none transition-all">
-                    </div>
-                    <div class="relative">
-                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Bank Name</label>
-                        <input type="text" name="bank_name" value="<?php echo e($settings['bank_name']); ?>" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-<?php echo e($currentTheme['accent']); ?> focus:outline-none transition-all">
-                    </div>
-                </div>
-
-                <!-- Row 4: IFSC, Acc No, Branch -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <div class="relative">
-                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">IFSC Code</label>
-                        <input type="text" name="bank_ifsc" value="<?php echo e($settings['bank_ifsc']); ?>" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-<?php echo e($currentTheme['accent']); ?> focus:outline-none transition-all font-mono uppercase">
-                    </div>
-                    <div class="relative">
-                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Account No.</label>
-                        <input type="text" name="bank_acc_no" value="<?php echo e($settings['bank_acc_no']); ?>" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-<?php echo e($currentTheme['accent']); ?> focus:outline-none transition-all font-mono">
-                    </div>
-                    <div class="relative">
-                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Branch</label>
-                        <input type="text" name="bank_branch" value="<?php echo e($settings['bank_branch']); ?>" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-<?php echo e($currentTheme['accent']); ?> focus:outline-none transition-all">
-                    </div>
-                </div>
-
-                <!-- Row 5: Account Type, Holder Name -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <div class="relative col-span-1">
-                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Account Type</label>
-                        <input type="text" name="bank_acc_type" value="<?php echo e($settings['bank_acc_type']); ?>" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-<?php echo e($currentTheme['accent']); ?> focus:outline-none transition-all">
-                    </div>
-                    <div class="relative col-span-1 lg:col-span-2">
-                        <label class="absolute -top-2 left-3 bg-white px-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">Holder Name</label>
-                        <input type="text" name="bank_holder" value="<?php echo e($settings['bank_holder']); ?>" class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-800 focus:border-<?php echo e($currentTheme['accent']); ?> focus:outline-none transition-all">
                     </div>
                 </div>
 
@@ -223,6 +191,37 @@
                     <div class="space-y-1.5 md:col-span-2">
                         <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-0.5">Banner Scroller</label>
                         <input type="text" name="banner_scroller" value="<?php echo e($settings['banner_scroller']); ?>" placeholder="Hurry, stock is running out!" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-slate-700 focus:outline-none transition-all">
+                    </div>
+                </div>
+
+                <div class="space-y-4 pt-4 border-t border-slate-100 font-semibold text-xs">
+                    <span class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-2">Marquee Header Alerts (Text Inputs)</span>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider px-0.5">Alert Item #1 (Bullhorn Icon)</label>
+                            <input type="text" name="marquee_alert_1" value="<?php echo e($settings['marquee_alert_1'] ?? ''); ?>" placeholder="e.g. Fresh and Warm Bakes Everyday" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider px-0.5">Alert Item #2 (Exclamation Icon)</label>
+                            <input type="text" name="marquee_alert_2" value="<?php echo e($settings['marquee_alert_2'] ?? ''); ?>" placeholder="e.g. Minimum Order Value is ₹1000" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider px-0.5">Alert Item #3 (Fire Icon)</label>
+                            <input type="text" name="marquee_alert_3" value="<?php echo e($settings['marquee_alert_3'] ?? ''); ?>" placeholder="e.g. Flat 60% Discount!" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider px-0.5">Alert Item #4 (Truck Icon)</label>
+                            <input type="text" name="marquee_alert_4" value="<?php echo e($settings['marquee_alert_4'] ?? ''); ?>" placeholder="e.g. Express Lorry Transport Delivery Across States!" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider px-0.5">Alert Item #5 (Phone Icon)</label>
+                            <input type="text" name="marquee_alert_5" value="<?php echo e($settings['marquee_alert_5'] ?? ''); ?>" placeholder="e.g. Contact Support: 8682942042" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider px-0.5">Alert Item #6 (Shield Icon)</label>
+                            <input type="text" name="marquee_alert_6" value="<?php echo e($settings['marquee_alert_6'] ?? ''); ?>" placeholder="e.g. 100% Quality & Safe Manufactured Crackers" class="w-full bg-slate-50 border border-slate-200 focus:border-<?php echo e($currentTheme['accent']); ?> focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -329,6 +328,12 @@
                     'icon' => 'fa-address-card',
                     'prefix' => 'aboutus_image_',
                     'slots' => 1,
+                ],
+                'gallery' => [
+                    'title' => 'About Us Gallery Images',
+                    'icon' => 'fa-images',
+                    'prefix' => 'gallery_image_',
+                    'slots' => 18,
                 ]
             ];
         ?>
@@ -363,9 +368,8 @@
                         <div class="w-full aspect-video rounded-xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center text-slate-350 shadow-inner relative group">
                             <?php if($path && file_exists(public_path($path))): ?>
                                 <img src="/<?php echo e($path); ?>" alt="<?php echo e($section['title']); ?> Slot <?php echo e($slot); ?>" class="object-cover w-full h-full">
-                                <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-[10px] text-white font-extrabold uppercase tracking-widest">
-                                    Slot <?php echo e($slot); ?>
-
+                                <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <i class="fa-solid fa-magnifying-glass-plus text-white text-2xl"></i>
                                 </div>
                             <?php else: ?>
                                 <div class="text-center p-4">

@@ -25,9 +25,16 @@ class BrandingController extends Controller
             'about_us_badge', 'about_us_title',
             'slider_image_1', 'slider_image_2', 'slider_image_3',
             'aboutus_image_1',
+            'gallery_image_1', 'gallery_image_2', 'gallery_image_3',
+            'gallery_image_4', 'gallery_image_5', 'gallery_image_6',
+            'gallery_image_7', 'gallery_image_8', 'gallery_image_9',
+            'gallery_image_10', 'gallery_image_11', 'gallery_image_12',
+            'gallery_image_13', 'gallery_image_14', 'gallery_image_15',
+            'gallery_image_16', 'gallery_image_17', 'gallery_image_18',
             'store_address', 'store_phone', 'store_email',
             'bank_name', 'bank_ifsc', 'bank_acc_no', 'bank_holder', 'bank_branch', 'bank_acc_type',
             'license_name', 'license_no', 'store_map_iframe',
+            'marquee_alert_1', 'marquee_alert_2', 'marquee_alert_3', 'marquee_alert_4', 'marquee_alert_5', 'marquee_alert_6',
         ];
 
         $settings = [];
@@ -65,7 +72,12 @@ class BrandingController extends Controller
     public function update(Request $request)
     {
         // 1. Handle all text / text-area input fields
-        $fields = $request->except(['_token', 'slider_image_1', 'slider_image_2', 'slider_image_3', 'aboutus_image_1']);
+        $fields = $request->except([
+            '_token', 'slider_image_1', 'slider_image_2', 'slider_image_3', 'aboutus_image_1',
+            'gallery_image_1', 'gallery_image_2', 'gallery_image_3', 'gallery_image_4', 'gallery_image_5', 'gallery_image_6',
+            'gallery_image_7', 'gallery_image_8', 'gallery_image_9', 'gallery_image_10', 'gallery_image_11', 'gallery_image_12',
+            'gallery_image_13', 'gallery_image_14', 'gallery_image_15', 'gallery_image_16', 'gallery_image_17', 'gallery_image_18'
+        ]);
 
         foreach ($fields as $key => $value) {
             $type = 'text';
@@ -88,6 +100,12 @@ class BrandingController extends Controller
         $imageFields = [
             'slider_image_1', 'slider_image_2', 'slider_image_3',
             'aboutus_image_1',
+            'gallery_image_1', 'gallery_image_2', 'gallery_image_3',
+            'gallery_image_4', 'gallery_image_5', 'gallery_image_6',
+            'gallery_image_7', 'gallery_image_8', 'gallery_image_9',
+            'gallery_image_10', 'gallery_image_11', 'gallery_image_12',
+            'gallery_image_13', 'gallery_image_14', 'gallery_image_15',
+            'gallery_image_16', 'gallery_image_17', 'gallery_image_18',
         ];
 
         $company = view()->shared('currentCompany');

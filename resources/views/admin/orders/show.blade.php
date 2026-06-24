@@ -100,29 +100,37 @@
             </div>
 
             <!-- Ordered Line Items -->
-            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                <table class="w-full text-left text-xs border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-450 font-bold text-[10px] uppercase tracking-wider">
-                            <th class="py-3.5 px-4">Firecracker Name</th>
-                            <th class="py-3.5 px-4 text-center">Unit</th>
-                            <th class="py-3.5 px-4 text-right">Price (₹)</th>
-                            <th class="py-3.5 px-4 text-center">Qty Ordered</th>
-                            <th class="py-3.5 px-4 text-right pr-4">Total (₹)</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-150 text-slate-700 font-semibold">
-                        @foreach($order->items as $item)
-                        <tr class="hover:bg-slate-50/50">
-                            <td class="py-3 px-4 text-slate-800">{{ $item->product_name }}</td>
-                            <td class="py-3 px-4 text-slate-400 text-center font-mono">{{ $item->pack_size }}</td>
-                            <td class="py-3 px-4 text-right text-slate-600">₹{{ number_format($item->price, 2) }}</td>
-                            <td class="py-3 px-4 text-center text-slate-800 font-mono font-bold">{{ $item->quantity }}</td>
-                            <td class="py-3 px-4 text-right font-bold text-slate-800 pr-4">₹{{ number_format($item->total_price, 2) }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center px-1">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Ordered Line Items</h3>
+                    <a href="{{ route('admin.orders.edit_items', $order->id) }}" class="text-crimson-600 hover:text-crimson-700 hover:underline font-bold text-[11px] flex items-center gap-1">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit Order Items
+                    </a>
+                </div>
+                <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-450 font-bold text-[10px] uppercase tracking-wider">
+                                <th class="py-3.5 px-4">Firecracker Name</th>
+                                <th class="py-3.5 px-4 text-center">Unit</th>
+                                <th class="py-3.5 px-4 text-right">Price (₹)</th>
+                                <th class="py-3.5 px-4 text-center">Qty Ordered</th>
+                                <th class="py-3.5 px-4 text-right pr-4">Total (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-150 text-slate-700 font-semibold">
+                            @foreach($order->items as $item)
+                            <tr class="hover:bg-slate-50/50">
+                                <td class="py-3 px-4 text-slate-800">{{ $item->product_name }}</td>
+                                <td class="py-3 px-4 text-slate-400 text-center font-mono">{{ $item->pack_size }}</td>
+                                <td class="py-3 px-4 text-right text-slate-600">₹{{ number_format($item->price, 2) }}</td>
+                                <td class="py-3 px-4 text-center text-slate-800 font-mono font-bold">{{ $item->quantity }}</td>
+                                <td class="py-3 px-4 text-right font-bold text-slate-800 pr-4">₹{{ number_format($item->total_price, 2) }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Totals -->

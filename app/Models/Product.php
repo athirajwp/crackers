@@ -14,6 +14,7 @@ class Product extends Model
         'mrp',
         'selling_price',
         'image',
+        'sort_order',
         'status',
     ];
 

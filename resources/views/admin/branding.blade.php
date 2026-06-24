@@ -193,6 +193,37 @@
                         <input type="text" name="banner_scroller" value="{{ $settings['banner_scroller'] }}" placeholder="Hurry, stock is running out!" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2.5 text-slate-700 focus:outline-none transition-all">
                     </div>
                 </div>
+
+                <div class="space-y-4 pt-4 border-t border-slate-100 font-semibold text-xs">
+                    <span class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-2">Marquee Header Alerts (Text Inputs)</span>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider px-0.5">Alert Item #1 (Bullhorn Icon)</label>
+                            <input type="text" name="marquee_alert_1" value="{{ $settings['marquee_alert_1'] ?? '' }}" placeholder="e.g. Fresh and Warm Bakes Everyday" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider px-0.5">Alert Item #2 (Exclamation Icon)</label>
+                            <input type="text" name="marquee_alert_2" value="{{ $settings['marquee_alert_2'] ?? '' }}" placeholder="e.g. Minimum Order Value is ₹1000" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider px-0.5">Alert Item #3 (Fire Icon)</label>
+                            <input type="text" name="marquee_alert_3" value="{{ $settings['marquee_alert_3'] ?? '' }}" placeholder="e.g. Flat 60% Discount!" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider px-0.5">Alert Item #4 (Truck Icon)</label>
+                            <input type="text" name="marquee_alert_4" value="{{ $settings['marquee_alert_4'] ?? '' }}" placeholder="e.g. Express Lorry Transport Delivery Across States!" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider px-0.5">Alert Item #5 (Phone Icon)</label>
+                            <input type="text" name="marquee_alert_5" value="{{ $settings['marquee_alert_5'] ?? '' }}" placeholder="e.g. Contact Support: 8682942042" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider px-0.5">Alert Item #6 (Shield Icon)</label>
+                            <input type="text" name="marquee_alert_6" value="{{ $settings['marquee_alert_6'] ?? '' }}" placeholder="e.g. 100% Quality & Safe Manufactured Crackers" class="w-full bg-slate-50 border border-slate-200 focus:border-{{ $currentTheme['accent'] }} focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Legal Compliance & License Settings -->
@@ -295,6 +326,12 @@
                     'icon' => 'fa-address-card',
                     'prefix' => 'aboutus_image_',
                     'slots' => 1,
+                ],
+                'gallery' => [
+                    'title' => 'About Us Gallery Images',
+                    'icon' => 'fa-images',
+                    'prefix' => 'gallery_image_',
+                    'slots' => 18,
                 ]
             ];
         @endphp
@@ -327,8 +364,8 @@
                         <div class="w-full aspect-video rounded-xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center text-slate-350 shadow-inner relative group">
                             @if($path && file_exists(public_path($path)))
                                 <img src="/{{ $path }}" alt="{{ $section['title'] }} Slot {{ $slot }}" class="object-cover w-full h-full">
-                                <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-[10px] text-white font-extrabold uppercase tracking-widest">
-                                    Slot {{ $slot }}
+                                <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <i class="fa-solid fa-magnifying-glass-plus text-white text-2xl"></i>
                                 </div>
                             @else
                                 <div class="text-center p-4">

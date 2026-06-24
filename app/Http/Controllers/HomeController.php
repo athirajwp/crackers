@@ -16,7 +16,7 @@ class HomeController extends Controller
     {
         $categories = Category::active()
             ->with(['products' => function ($query) {
-                $query->active();
+                $query->active()->orderBy('sort_order', 'asc');
             }])
             ->orderBy('sort_order', 'asc')
             ->get();
@@ -60,7 +60,7 @@ class HomeController extends Controller
     {
         $categories = Category::active()
             ->with(['products' => function ($query) {
-                $query->active();
+                $query->active()->orderBy('sort_order', 'asc');
             }])
             ->orderBy('sort_order', 'asc')
             ->get();

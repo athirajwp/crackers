@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice - {{ $order->order_number }}</title>
+    <title>Invoice - <?php echo e($order->order_number); ?></title>
     <style>
         body {
             font-family: 'Courier New', Courier, monospace, Arial, sans-serif;
@@ -139,18 +139,20 @@
         <table class="header-table">
             <tr>
                 <td>
-                    <div class="header-brand">{{ strtoupper(App\Models\Setting::get('store_name', 'Cracker Demo')) }}</div>
+                    <div class="header-brand"><?php echo e(strtoupper(App\Models\Setting::get('store_name', 'Cracker Demo'))); ?></div>
                     <div style="font-size: 10px; margin-top: 3px;">
                         Virudhunagar to Sivakasi Main Road, Sivakasi.<br>
-                        Phone: {{ App\Models\Setting::get('store_phone', '+91 7010619528') }} | Email: {{ App\Models\Setting::get('store_email', 'crackerdemo@gmail.com') }}
+                        Phone: <?php echo e(App\Models\Setting::get('store_phone', '+91 7010619528')); ?> | Email: <?php echo e(App\Models\Setting::get('store_email', 'crackerdemo@gmail.com')); ?>
+
                     </div>
                 </td>
                 <td class="header-details">
                     <div style="font-size: 14px; font-weight: bold;">ESTIMATE INVOICE</div>
                     <div style="margin-top: 5px;">
-                        <strong>Invoice No:</strong> {{ $order->order_number }}<br>
-                        <strong>Date:</strong> {{ $order->created_at->format('d/m/Y h:i A') }}<br>
-                        <strong>Status:</strong> {{ strtoupper($order->order_status) }}
+                        <strong>Invoice No:</strong> <?php echo e($order->order_number); ?><br>
+                        <strong>Date:</strong> <?php echo e($order->created_at->format('d/m/Y h:i A')); ?><br>
+                        <strong>Status:</strong> <?php echo e(strtoupper($order->order_status)); ?>
+
                     </div>
                 </td>
             </tr>
@@ -161,24 +163,25 @@
             <tr>
                 <td class="info-col">
                     <div class="info-title">Deliver To</div>
-                    <strong>{{ $order->name }}</strong><br>
-                    {{ $order->address }}<br>
-                    @if($order->landmark)
-                        Landmark: {{ $order->landmark }}<br>
-                    @endif
-                    {{ $order->city }}, {{ $order->state }} - {{ $order->pincode }}<br>
-                    Phone: {{ $order->phone }}
+                    <strong><?php echo e($order->name); ?></strong><br>
+                    <?php echo e($order->address); ?><br>
+                    <?php if($order->landmark): ?>
+                        Landmark: <?php echo e($order->landmark); ?><br>
+                    <?php endif; ?>
+                    <?php echo e($order->city); ?>, <?php echo e($order->state); ?> - <?php echo e($order->pincode); ?><br>
+                    Phone: <?php echo e($order->phone); ?>
+
                 </td>
                 <td class="info-col" style="padding-left: 20px;">
                     <div class="info-title">Booking Details</div>
                     <strong>Payment Mode:</strong> Offline Payment<br>
-                    <strong>Payment Status:</strong> {{ strtoupper($order->payment_status) }}<br>
-                    @if($order->transport_name)
-                        <strong>Transport Lorry:</strong> {{ $order->transport_name }}<br>
-                    @endif
-                    @if($order->lr_number)
-                        <strong>LR Number:</strong> {{ $order->lr_number }}<br>
-                    @endif
+                    <strong>Payment Status:</strong> <?php echo e(strtoupper($order->payment_status)); ?><br>
+                    <?php if($order->transport_name): ?>
+                        <strong>Transport Lorry:</strong> <?php echo e($order->transport_name); ?><br>
+                    <?php endif; ?>
+                    <?php if($order->lr_number): ?>
+                        <strong>LR Number:</strong> <?php echo e($order->lr_number); ?><br>
+                    <?php endif; ?>
                 </td>
             </tr>
         </table>
@@ -196,23 +199,23 @@
                 </tr>
             </thead>
             <tbody>
-                @php $sno = 1; @endphp
-                @foreach($order->items as $item)
+                <?php $sno = 1; ?>
+                <?php $__currentLoopData = $order->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
-                    <td style="width: 5%;">{{ $sno++ }}</td>
-                    <td style="width: 45%;">{{ $item->product_name }}</td>
-                    <td class="text-center" style="width: 8%;">{{ $item->quantity }}</td>
-                    <td class="text-center" style="width: 15%;">{{ $item->pack_size }}</td>
-                    <td class="text-right" style="width: 12%;">{{ number_format($item->price, 2) }}</td>
-                    <td class="text-right" style="width: 15%;">{{ number_format($item->total_price, 2) }}</td>
+                    <td style="width: 5%;"><?php echo e($sno++); ?></td>
+                    <td style="width: 45%;"><?php echo e($item->product_name); ?></td>
+                    <td class="text-center" style="width: 8%;"><?php echo e($item->quantity); ?></td>
+                    <td class="text-center" style="width: 15%;"><?php echo e($item->pack_size); ?></td>
+                    <td class="text-right" style="width: 12%;"><?php echo e(number_format($item->price, 2)); ?></td>
+                    <td class="text-right" style="width: 15%;"><?php echo e(number_format($item->total_price, 2)); ?></td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                 <!-- Totals rows -->
                 <tr class="total-row">
                     <td colspan="4" style="border: none;"></td>
                     <td class="text-right" style="padding-top: 15px;">Net Paid:</td>
-                    <td class="text-right" style="padding-top: 15px;">₹{{ number_format($order->net_amount, 2) }}</td>
+                    <td class="text-right" style="padding-top: 15px;">₹<?php echo e(number_format($order->net_amount, 2)); ?></td>
                 </tr>
             </tbody>
         </table>
@@ -230,7 +233,7 @@
                     Customer Signature
                 </td>
                 <td class="sign-col text-right">
-                    For <strong>{{ App\Models\Setting::get('store_name', 'Cracker Demo') }}</strong>
+                    For <strong><?php echo e(App\Models\Setting::get('store_name', 'Cracker Demo')); ?></strong>
                 </td>
             </tr>
         </table>
@@ -244,3 +247,4 @@
 
 </body>
 </html>
+<?php /**PATH C:\Users\Athi\OneDrive\Desktop\crackers\resources\views/admin/orders/invoice.blade.php ENDPATH**/ ?>

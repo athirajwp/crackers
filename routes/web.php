@@ -65,6 +65,8 @@ Route::middleware(['admin.auth'])->prefix('admin')->name('admin.')->group(functi
     // Booking orders registry & transport logs
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{order}/edit-items', [OrderController::class, 'editItems'])->name('orders.edit_items');
+    Route::put('/orders/{order}/edit-items', [OrderController::class, 'updateItems'])->name('orders.update_items');
     Route::put('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::get('/orders/{order}/invoice', [OrderController::class, 'printInvoice'])->name('orders.invoice');
 });

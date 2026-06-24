@@ -15,7 +15,34 @@
             <p class="text-[10px] text-slate-450 uppercase tracking-widest leading-none font-bold">Reference: <strong class="text-slate-700 font-mono select-all"><?php echo e($order->order_number); ?></strong></p>
         </div>
         
+        <?php
+            $storeName = App\Models\Setting::get('store_name', 'Cracker Store');
+            $waMessage = "Hello *" . $order->name . "*,\n\n"
+                       . "Here is the invoice summary for your order at *" . $storeName . "*:\n\n"
+                       . "*Order Number:* " . $order->order_number . "\n"
+                       . "*Order Date:* " . $order->created_at->format('d M Y, h:i A') . "\n"
+                       . "*Net Amount:* ₹" . number_format($order->net_amount, 2) . "\n"
+                       . "*Order Status:* " . ucfirst($order->order_status) . "\n"
+                       . "*Payment Status:* " . ucfirst($order->payment_status) . "\n\n"
+                       . "*Order Items Summary:*\n";
+            
+            foreach($order->items as $item) {
+                $waMessage .= "• " . $item->product_name . " (Qty: " . $item->quantity . ") - ₹" . number_format($item->total_price, 2) . "\n";
+            }
+            
+            $waMessage .= "\nTrack your order here: " . route('track.index', ['query' => $order->order_number]) . "\n\n"
+                        . "Thank you for booking with us!";
+            
+            $targetPhone = preg_replace('/[^0-9]/', '', $order->whatsapp ?: $order->phone);
+            if (strlen($targetPhone) === 10) {
+                $targetPhone = '91' . $targetPhone;
+            }
+            $waUrl = "https://api.whatsapp.com/send?phone=" . $targetPhone . "&text=" . urlencode($waMessage);
+        ?>
         <div class="flex gap-3">
+            <a href="<?php echo e($waUrl); ?>" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all active:scale-95">
+                <i class="fa-brands fa-whatsapp text-[13px]"></i> Send WhatsApp Invoice
+            </a>
             <a href="<?php echo e(route('admin.orders.invoice', $order->id)); ?>" target="_blank" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all active:scale-95">
                 <i class="fa-solid fa-file-invoice text-crimson-600"></i> View Retail Invoice
             </a>
@@ -43,14 +70,26 @@
                 </div>
                 <div class="space-y-2.5">
                     <div class="text-slate-400 uppercase tracking-wider text-[10px] font-bold">Contact Particulars</div>
-                    <div class="flex justify-between">
+                    <div class="flex justify-between items-center">
                         <span class="text-slate-500">Contact Mobile:</span>
-                        <strong class="text-slate-800 font-mono select-all"><?php echo e($order->phone); ?></strong>
+                        <a href="tel:<?php echo e($order->phone); ?>" class="text-slate-700 hover:text-crimson-600 hover:underline font-mono select-all font-bold">
+                            <?php echo e($order->phone); ?> <i class="fa-solid fa-phone text-[10px] ml-1 opacity-70"></i>
+                        </a>
                     </div>
                     <?php if($order->whatsapp): ?>
-                    <div class="flex justify-between">
+                    <div class="flex justify-between items-center">
                         <span class="text-slate-500">WhatsApp:</span>
-                        <strong class="text-slate-800 font-mono select-all"><?php echo e($order->whatsapp); ?></strong>
+                        <a href="<?php echo e($waUrl); ?>" target="_blank" class="text-emerald-600 hover:underline font-mono select-all font-bold" title="Send WhatsApp Invoice">
+                            <?php echo e($order->whatsapp); ?> <i class="fa-brands fa-whatsapp text-[11px] ml-1"></i>
+                        </a>
+                    </div>
+                    <?php endif; ?>
+                    <?php if($order->email): ?>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500">Contact Email:</span>
+                        <a href="mailto:<?php echo e($order->email); ?>" class="text-crimson-600 hover:underline font-mono select-all font-bold">
+                            <?php echo e($order->email); ?> <i class="fa-solid fa-envelope text-[10px] ml-1 opacity-70"></i>
+                        </a>
                     </div>
                     <?php endif; ?>
                     <div class="flex justify-between border-t border-slate-200 pt-2.5">
@@ -61,29 +100,37 @@
             </div>
 
             <!-- Ordered Line Items -->
-            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                <table class="w-full text-left text-xs border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-450 font-bold text-[10px] uppercase tracking-wider">
-                            <th class="py-3.5 px-4">Firecracker Name</th>
-                            <th class="py-3.5 px-4 text-center">Unit</th>
-                            <th class="py-3.5 px-4 text-right">Price (₹)</th>
-                            <th class="py-3.5 px-4 text-center">Qty Ordered</th>
-                            <th class="py-3.5 px-4 text-right pr-4">Total (₹)</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-150 text-slate-700 font-semibold">
-                        <?php $__currentLoopData = $order->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <tr class="hover:bg-slate-50/50">
-                            <td class="py-3 px-4 text-slate-800"><?php echo e($item->product_name); ?></td>
-                            <td class="py-3 px-4 text-slate-400 text-center font-mono"><?php echo e($item->pack_size); ?></td>
-                            <td class="py-3 px-4 text-right text-slate-600">₹<?php echo e(number_format($item->price, 2)); ?></td>
-                            <td class="py-3 px-4 text-center text-slate-800 font-mono font-bold"><?php echo e($item->quantity); ?></td>
-                            <td class="py-3 px-4 text-right font-bold text-slate-800 pr-4">₹<?php echo e(number_format($item->total_price, 2)); ?></td>
-                        </tr>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </tbody>
-                </table>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center px-1">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Ordered Line Items</h3>
+                    <a href="<?php echo e(route('admin.orders.edit_items', $order->id)); ?>" class="text-crimson-600 hover:text-crimson-700 hover:underline font-bold text-[11px] flex items-center gap-1">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit Order Items
+                    </a>
+                </div>
+                <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-450 font-bold text-[10px] uppercase tracking-wider">
+                                <th class="py-3.5 px-4">Firecracker Name</th>
+                                <th class="py-3.5 px-4 text-center">Unit</th>
+                                <th class="py-3.5 px-4 text-right">Price (₹)</th>
+                                <th class="py-3.5 px-4 text-center">Qty Ordered</th>
+                                <th class="py-3.5 px-4 text-right pr-4">Total (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-150 text-slate-700 font-semibold">
+                            <?php $__currentLoopData = $order->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <tr class="hover:bg-slate-50/50">
+                                <td class="py-3 px-4 text-slate-800"><?php echo e($item->product_name); ?></td>
+                                <td class="py-3 px-4 text-slate-400 text-center font-mono"><?php echo e($item->pack_size); ?></td>
+                                <td class="py-3 px-4 text-right text-slate-600">₹<?php echo e(number_format($item->price, 2)); ?></td>
+                                <td class="py-3 px-4 text-center text-slate-800 font-mono font-bold"><?php echo e($item->quantity); ?></td>
+                                <td class="py-3 px-4 text-right font-bold text-slate-800 pr-4">₹<?php echo e(number_format($item->total_price, 2)); ?></td>
+                            </tr>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Totals -->
