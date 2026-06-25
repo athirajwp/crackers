@@ -57,13 +57,13 @@ class Order extends Model
     public function getOrderStatusBadgeAttribute(): string
     {
         return match ($this->order_status) {
-            'pending' => 'bg-warning text-dark',
-            'approved' => 'bg-info text-white',
-            'processing' => 'bg-primary text-white',
-            'shipped' => 'bg-purple text-white', // custom purple
-            'delivered' => 'bg-success text-white',
-            'cancelled' => 'bg-danger text-white',
-            default => 'bg-secondary text-white',
+            'pending' => 'bg-amber-500 text-white',
+            'approved' => 'bg-sky-500 text-white',
+            'processing' => 'bg-blue-600 text-white',
+            'shipped' => 'bg-purple-600 text-white',
+            'delivered' => 'bg-emerald-600 text-white',
+            'cancelled' => 'bg-rose-600 text-white',
+            default => 'bg-slate-500 text-white',
         };
     }
 
@@ -73,10 +73,10 @@ class Order extends Model
     public function getPaymentStatusBadgeAttribute(): string
     {
         return match ($this->payment_status) {
-            'pending' => 'bg-danger text-white',
-            'paid' => 'bg-success text-white',
-            'verified' => 'bg-success text-white',
-            default => 'bg-secondary text-white',
+            'pending' => 'bg-rose-600 text-white',
+            'paid' => 'bg-emerald-600 text-white',
+            'verified' => 'bg-emerald-600 text-white',
+            default => 'bg-slate-500 text-white',
         };
     }
 }

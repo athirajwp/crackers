@@ -332,6 +332,14 @@
             height: 100% !important;
             border: 0;
         }
+        /* Compatibility styles for legacy badge classes */
+        .bg-danger { background-color: #e11d48 !important; }
+        .bg-warning { background-color: #d97706 !important; }
+        .bg-success { background-color: #059669 !important; }
+        .bg-info { background-color: #0284c7 !important; }
+        .bg-primary { background-color: #2563eb !important; }
+        .bg-secondary { background-color: #475569 !important; }
+        .text-dark { color: #0f172a !important; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans selection:bg-gold-500 selection:text-slate-900">

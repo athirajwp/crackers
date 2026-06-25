@@ -1,4 +1,4 @@
-@php
+<?php
     $theme = App\Models\Setting::get('admin_theme', 'gold');
     
     // Set theme classes
@@ -75,14 +75,14 @@
     if (!$superAdminUsername) {
         $superAdminUsername = env('SUPER_ADMIN_USERNAME', 'superadmin');
     }
-@endphp
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Super Admin Console | Multi-Domain Controller')</title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <title><?php echo $__env->yieldContent('title', 'Super Admin Console | Multi-Domain Controller'); ?></title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://img.icons8.com/color/48/globe.png">
@@ -181,18 +181,18 @@
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans select-none" x-data="{ sidebarOpen: window.innerWidth >= 768 }">
 
     <!-- 1. Top Navbar Header exactly matching screenshot -->
-    <header class="{{ $currentTheme['topbar'] }} z-40 px-4 py-2.5 flex items-center justify-between sticky top-0 select-none">
+    <header class="<?php echo e($currentTheme['topbar']); ?> z-40 px-4 py-2.5 flex items-center justify-between sticky top-0 select-none">
         
         <!-- Left Section: Toggle Hamburger & Brand Logo -->
         <div class="flex items-center gap-4">
             <!-- Sidebar Toggler -->
-            <button @click="sidebarOpen = !sidebarOpen" class="{{ $currentTheme['topbar_btn'] }} p-2 rounded-lg transition-colors focus:outline-none">
+            <button @click="sidebarOpen = !sidebarOpen" class="<?php echo e($currentTheme['topbar_btn']); ?> p-2 rounded-lg transition-colors focus:outline-none">
                 <i class="fa-solid fa-bars text-lg"></i>
             </button>
             
             <!-- Brand Logo -->
-            <a href="/" class="flex items-center gap-2 {{ $currentTheme['logo_border'] }} px-3 py-1.5 rounded-xl transition-all">
-                <div class="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm shadow {{ $currentTheme['logo_bg'] }}">
+            <a href="/" class="flex items-center gap-2 <?php echo e($currentTheme['logo_border']); ?> px-3 py-1.5 rounded-xl transition-all">
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm shadow <?php echo e($currentTheme['logo_bg']); ?>">
                     C
                 </div>
                 <span class="font-extrabold text-sm tracking-wider uppercase">Crackers Sys</span>
@@ -202,13 +202,13 @@
         <!-- Right Section: Navigation utilities & Admin profile -->
         <div class="flex items-center gap-4 text-sm font-semibold select-none">
             <!-- Messages Icon -->
-            <button class="{{ $currentTheme['topbar_btn'] }} p-2 rounded-xl transition-colors relative" title="Notification Logs">
+            <button class="<?php echo e($currentTheme['topbar_btn']); ?> p-2 rounded-xl transition-colors relative" title="Notification Logs">
                 <i class="fa-solid fa-envelope text-base"></i>
                 <span class="absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
             </button>
             
             <!-- Notification Icon -->
-            <button class="{{ $currentTheme['topbar_btn'] }} p-2 rounded-xl transition-colors relative" title="System Alerts">
+            <button class="<?php echo e($currentTheme['topbar_btn']); ?> p-2 rounded-xl transition-colors relative" title="System Alerts">
                 <i class="fa-solid fa-bell text-base"></i>
                 <span class="absolute top-1 right-1 w-2 h-2 bg-crimson-450 rounded-full animate-ping"></span>
             </button>
@@ -217,22 +217,22 @@
 
             <!-- Active User sadmin Dropdown Profile -->
             <div x-data="{ userOpen: false }" class="relative select-none">
-                <button @click="userOpen = !userOpen" class="flex items-center gap-2 {{ $currentTheme['topbar_btn'] }} px-3 py-1.5 rounded-xl transition-all focus:outline-none">
+                <button @click="userOpen = !userOpen" class="flex items-center gap-2 <?php echo e($currentTheme['topbar_btn']); ?> px-3 py-1.5 rounded-xl transition-all focus:outline-none">
                     <div class="w-8 h-8 rounded-lg bg-white/20 border border-white/30 overflow-hidden flex items-center justify-center">
                         <i class="fa-solid fa-user text-sm"></i>
                     </div>
-                    <span class="hidden sm:inline text-xs font-bold uppercase tracking-wider">{{ $superAdminUsername }}</span>
+                    <span class="hidden sm:inline text-xs font-bold uppercase tracking-wider"><?php echo e($superAdminUsername); ?></span>
                     <i class="fa-solid fa-chevron-down text-[10px] opacity-80 transition-transform" :class="userOpen ? 'rotate-180' : 'rotate-0'"></i>
                 </button>
                 
                 <!-- Dropdown items -->
                 <div x-show="userOpen" @click.away="userOpen = false" x-transition class="absolute right-0 mt-2 w-48 bg-white text-slate-800 rounded-2xl shadow-xl border border-slate-100 py-2 text-xs font-semibold" style="display: none;">
-                    <a href="{{ route('admin_sys.profile') }}" class="flex items-center gap-2 px-4 py-2.5 hover:bg-slate-50 transition-colors">
-                        <i class="fa-solid fa-user-shield {{ $currentTheme['text'] }}"></i> Console Profile
+                    <a href="<?php echo e(route('admin_sys.profile')); ?>" class="flex items-center gap-2 px-4 py-2.5 hover:bg-slate-50 transition-colors">
+                        <i class="fa-solid fa-user-shield <?php echo e($currentTheme['text']); ?>"></i> Console Profile
                     </a>
                     <hr class="border-slate-100 my-1">
-                    <form action="{{ route('admin_sys.logout') }}" method="POST" class="w-full">
-                        @csrf
+                    <form action="<?php echo e(route('admin_sys.logout')); ?>" method="POST" class="w-full">
+                        <?php echo csrf_field(); ?>
                         <button type="submit" class="w-full text-left flex items-center gap-2 px-4 py-2.5 hover:bg-rose-50 text-crimson-600 transition-colors">
                             <i class="fa-solid fa-power-off"></i> System Logout
                         </button>
@@ -260,17 +260,17 @@
 
                 <!-- Navigation links -->
                 <nav class="space-y-1.5">
-                    <a href="{{ route('admin_sys.company.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold {{ request()->routeIs('admin_sys.company.index') ? $currentTheme['sidebar_active'] : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800' }} transition-all">
+                    <a href="<?php echo e(route('admin_sys.company.index')); ?>" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold <?php echo e(request()->routeIs('admin_sys.company.index') ? $currentTheme['sidebar_active'] : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'); ?> transition-all">
                         <i class="fa-solid fa-network-wired text-sm"></i>
                         <span>Website Overview</span>
                     </a>
 
-                    <a href="{{ route('admin_sys.profile') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold {{ request()->routeIs('admin_sys.profile') ? $currentTheme['sidebar_active'] : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800' }} transition-all">
+                    <a href="<?php echo e(route('admin_sys.profile')); ?>" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold <?php echo e(request()->routeIs('admin_sys.profile') ? $currentTheme['sidebar_active'] : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'); ?> transition-all">
                         <i class="fa-solid fa-user-shield text-sm"></i>
                         <span>Super Admin Profile</span>
                     </a>
-                    <form action="{{ route('admin_sys.logout') }}" method="POST" class="w-full">
-                        @csrf
+                    <form action="<?php echo e(route('admin_sys.logout')); ?>" method="POST" class="w-full">
+                        <?php echo csrf_field(); ?>
                         <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-all text-left">
                             <i class="fa-solid fa-power-off text-sm"></i>
                             <span>Console Logout</span>
@@ -287,32 +287,32 @@
 
         <!-- Right Main page dynamic content -->
         <main class="flex-grow p-6 md:p-8 overflow-x-hidden">
-            @yield('content')
+            <?php echo $__env->yieldContent('content'); ?>
         </main>
 
     </div>
 
     <!-- Alert toast display -->
-    @if(session('success'))
+    <?php if(session('success')): ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             Swal.fire({
                 toast: true,
                 position: 'top-end',
                 icon: 'success',
-                title: "{{ session('success') }}",
+                title: "<?php echo e(session('success')); ?>",
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: true,
             });
         });
     </script>
-    @endif
+    <?php endif; ?>
 
-    @if($errors->any())
+    <?php if($errors->any()): ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            let errorText = {!! json_encode(implode('<br>', $errors->all())) !!};
+            let errorText = <?php echo json_encode(implode('<br>', $errors->all())); ?>;
             Swal.fire({
                 icon: 'error',
                 title: 'Validation Failed',
@@ -322,9 +322,10 @@
             });
         });
     </script>
-    @endif
+    <?php endif; ?>
 
-    @yield('scripts')
+    <?php echo $__env->yieldContent('scripts'); ?>
 
 </body>
 </html>
+<?php /**PATH C:\Users\Athi\OneDrive\Desktop\crackers\resources\views/layouts/admin_sys.blade.php ENDPATH**/ ?>
