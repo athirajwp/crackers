@@ -48,7 +48,9 @@ class AuthController extends Controller
             $company = view()->shared('currentCompany');
             $companyCode = $company ? $company->code : 'default';
             session(['admin_logged_in_' . $companyCode => true]);
-            return redirect()->route('admin.dashboard');
+            // Use to() with a relative path to avoid APP_URL port mismatch
+            // (e.g. when running on port 8001/8002, route() would redirect to APP_URL port 8000)
+            return redirect()->to('/admin/dashboard');
         }
 
         return back()->withErrors(['password' => 'Invalid password!']);
@@ -62,6 +64,7 @@ class AuthController extends Controller
         $company = view()->shared('currentCompany');
         $companyCode = $company ? $company->code : 'default';
         session()->forget('admin_logged_in_' . $companyCode);
-        return redirect()->route('admin.login', ['company' => $companyCode]);
+        // Use to() with a relative path to avoid APP_URL port mismatch
+        return redirect()->to('/admin/login?company=' . $companyCode);
     }
 }

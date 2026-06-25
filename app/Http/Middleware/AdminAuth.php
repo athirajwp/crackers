@@ -19,7 +19,9 @@ class AdminAuth
         $companyCode = $company ? $company->code : 'default';
 
         if (!$request->session()->has('admin_logged_in_' . $companyCode)) {
-            return redirect()->route('admin.login', ['company' => $companyCode]);
+            // Use to() with a relative path to avoid APP_URL port mismatch
+            // (e.g. when running on port 8001/8002, route() would redirect to APP_URL port 8000)
+            return redirect()->to('/admin/login?company=' . $companyCode);
         }
 
         return $next($request);
